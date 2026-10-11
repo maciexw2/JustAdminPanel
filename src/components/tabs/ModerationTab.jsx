@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   X
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const initialBans = [
   {
@@ -76,6 +77,7 @@ const initialWarnings = [
 ];
 
 export default function ModerationTab({ onToast }) {
+  const { t } = useLanguage();
   const [bans, setBans] = useState(initialBans);
   const [warnings, setWarnings] = useState(initialWarnings);
   const [search, setSearch] = useState('');
@@ -107,7 +109,7 @@ export default function ModerationTab({ onToast }) {
 
   const handleUnban = async (banId, player) => {
     setBans((prev) => prev.filter((b) => b.id !== banId));
-    onToast?.(`Revoked ban ${banId} for ${player}`);
+    onToast?.(`${t.moderationTab.unban}: ${player}`);
 
     try {
       await fetch(`/api/bans?id=${encodeURIComponent(banId)}`, {
@@ -135,7 +137,7 @@ export default function ModerationTab({ onToast }) {
     setShowNewBanModal(false);
     setNewBanTarget('');
     setNewBanReason('');
-    onToast?.(`Sanction issued: ${newBanTarget} banned (${newBanDuration})`);
+    onToast?.(`Sanction issued: ${newBanTarget}`);
 
     try {
       await fetch('/api/bans', {
@@ -155,27 +157,27 @@ export default function ModerationTab({ onToast }) {
         gap: '12px'
       }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active Bans</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.moderationTab.statActiveBans}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-danger)', marginTop: '4px' }} className="num-tabular">
-            {bans.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>in txAdmin banlist</span>
+            {bans.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>txAdmin</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Permanent Bans</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.moderationTab.statPermBans}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
             {bans.filter((b) => b.isPermanent).length}
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active Warnings</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.moderationTab.statWarnings}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fbbf24', marginTop: '4px' }} className="num-tabular">
-            {warnings.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>points tracked</span>
+            {warnings.length}
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Moderation Status</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.moderationTab.statStatus}</div>
           <div style={{ fontSize: '14px', fontWeight: 600, color: '#4ade80', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CheckCircle2 size={15} /> All systems operational
+            <CheckCircle2 size={15} /> {t.moderationTab.allSystemsOk}
           </div>
         </div>
       </div>
@@ -195,7 +197,7 @@ export default function ModerationTab({ onToast }) {
               border: `1px solid ${activeSubTab === 'bans' ? 'var(--brand-purple)' : 'var(--border-subtle)'}`
             }}
           >
-            Active Bans ({bans.length})
+            {t.moderationTab.tabBans} ({bans.length})
           </button>
           <button
             onClick={() => setActiveSubTab('warnings')}
@@ -209,7 +211,7 @@ export default function ModerationTab({ onToast }) {
               border: `1px solid ${activeSubTab === 'warnings' ? 'var(--brand-purple)' : 'var(--border-subtle)'}`
             }}
           >
-            Warnings ({warnings.length})
+            {t.moderationTab.tabWarnings} ({warnings.length})
           </button>
         </div>
 
@@ -230,7 +232,7 @@ export default function ModerationTab({ onToast }) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by ID, name, reason..."
+              placeholder={t.moderationTab.searchBans}
               style={{
                 background: 'none',
                 border: 'none',
@@ -248,7 +250,7 @@ export default function ModerationTab({ onToast }) {
             style={{ height: '32px' }}
           >
             <Plus size={14} />
-            <span>Issue Sanction</span>
+            <span>{t.moderationTab.issueSanction}</span>
           </button>
         </div>
       </div>
@@ -267,12 +269,12 @@ export default function ModerationTab({ onToast }) {
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase'
               }}>
-                <th style={{ padding: '12px 18px', width: '100px' }}>BAN ID</th>
-                <th style={{ padding: '12px 16px' }}>TARGET PLAYER</th>
-                <th style={{ padding: '12px 16px' }}>REASON</th>
-                <th style={{ padding: '12px 16px' }}>ISSUED BY</th>
-                <th style={{ padding: '12px 16px', width: '130px' }}>DURATION</th>
-                <th style={{ padding: '12px 18px', textAlign: 'right', width: '110px' }}>ACTIONS</th>
+                <th style={{ padding: '12px 18px', width: '100px' }}>{t.moderationTab.thBanId}</th>
+                <th style={{ padding: '12px 16px' }}>{t.moderationTab.thTarget}</th>
+                <th style={{ padding: '12px 16px' }}>{t.moderationTab.thReason}</th>
+                <th style={{ padding: '12px 16px' }}>{t.moderationTab.thAdmin}</th>
+                <th style={{ padding: '12px 16px', width: '130px' }}>{t.moderationTab.thDuration}</th>
+                <th style={{ padding: '12px 18px', textAlign: 'right', width: '110px' }}>{t.moderationTab.thActions}</th>
               </tr>
             </thead>
             <tbody>
@@ -340,7 +342,7 @@ export default function ModerationTab({ onToast }) {
                         e.currentTarget.style.borderColor = 'var(--border-subtle)';
                       }}
                     >
-                      Unban
+                      {t.moderationTab.unban}
                     </button>
                   </td>
                 </tr>
@@ -425,7 +427,7 @@ export default function ModerationTab({ onToast }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Gavel size={16} color="var(--status-danger)" />
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>Issue Server Sanction</span>
+                <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>{t.moderationTab.modalTitle}</span>
               </div>
               <button onClick={() => setShowNewBanModal(false)} style={{ color: 'var(--text-muted)' }}>
                 <X size={16} />
@@ -435,7 +437,7 @@ export default function ModerationTab({ onToast }) {
             <form onSubmit={handleCreateBan} style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
-                  Target Player (Name, ID, or License)
+                  {t.moderationTab.targetLabel}
                 </label>
                 <input
                   type="text"
@@ -458,12 +460,12 @@ export default function ModerationTab({ onToast }) {
 
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
-                  Infraction Reason
+                  {t.moderationTab.reasonLabel}
                 </label>
                 <textarea
                   value={newBanReason}
                   onChange={(e) => setNewBanReason(e.target.value)}
-                  placeholder="Detail the rule broken, logs, or evidence..."
+                  placeholder="..."
                   rows={3}
                   style={{
                     width: '100%',
@@ -482,7 +484,7 @@ export default function ModerationTab({ onToast }) {
 
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
-                  Duration
+                  {t.moderationTab.durationLabel}
                 </label>
                 <select
                   value={newBanDuration}
@@ -498,11 +500,11 @@ export default function ModerationTab({ onToast }) {
                     outline: 'none'
                   }}
                 >
-                  <option value="Permanent">Permanent</option>
-                  <option value="30 Days">30 Days</option>
-                  <option value="7 Days">7 Days</option>
-                  <option value="3 Days">3 Days</option>
-                  <option value="24 Hours">24 Hours</option>
+                  <option value="Permanent">{t.moderationTab.permBan}</option>
+                  <option value="30 Days">30 Dni</option>
+                  <option value="7 Days">{t.moderationTab.days7}</option>
+                  <option value="3 Days">{t.moderationTab.days3}</option>
+                  <option value="24 Hours">24h</option>
                 </select>
               </div>
 
@@ -513,14 +515,14 @@ export default function ModerationTab({ onToast }) {
                   className="btn-secondary"
                   style={{ height: '32px' }}
                 >
-                  Cancel
+                  Anuluj
                 </button>
                 <button
                   type="submit"
                   className="btn-danger"
                   style={{ height: '32px', padding: '0 14px' }}
                 >
-                  Confirm Ban
+                  {t.moderationTab.submitSanction}
                 </button>
               </div>
             </form>

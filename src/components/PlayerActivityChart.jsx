@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 
-export default function PlayerActivityChart({ data, nowCount = 42 }) {
+export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
+  const { t } = useLanguage();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // wymiary svg
@@ -15,11 +17,19 @@ export default function PlayerActivityChart({ data, nowCount = 42 }) {
 
   const chartW = width - padLeft - padRight;
   const chartH = height - padTop - padBottom;
-  const maxPlayers = 130; // trohe ponad szczyt 118
+  const maxPlayers = 130;
+
+  const safeData = data && data.length > 0 ? data : [
+    { time: '00:00', players: 0 },
+    { time: '06:00', players: 0 },
+    { time: '12:00', players: 0 },
+    { time: '18:00', players: 0 },
+    { time: 'Now', players: nowCount, isCurrent: true }
+  ];
 
   // oblicz kordynaty
-  const points = data.map((d, i) => {
-    const x = padLeft + (i / (data.length - 1)) * chartW;
+  const points = safeData.map((d, i) => {
+    const x = padLeft + (i / Math.max(1, safeData.length - 1)) * chartW;
     const y = padTop + chartH - (d.players / maxPlayers) * chartH;
     return { ...d, x, y };
   });
@@ -57,8 +67,8 @@ export default function PlayerActivityChart({ data, nowCount = 42 }) {
     { label: '08:00', x: points[4]?.x },
     { label: '12:00', x: points[6]?.x },
     { label: '16:00', x: points[8]?.x },
-    { label: '21:00 (Peak)', x: peakPoint?.x, isHighlight: true },
-    { label: `Now (${nowCount})`, x: nowPoint?.x, isCurrent: true }
+    { label: `21:00 (${t.chart.peak})`, x: peakPoint?.x, isHighlight: true },
+    { label: `${t.chart.liveNow} (${nowCount})`, x: nowPoint?.x, isCurrent: true }
   ];
 
   const activePoint = hoveredIndex !== null ? points[hoveredIndex] : null;
@@ -70,7 +80,7 @@ export default function PlayerActivityChart({ data, nowCount = 42 }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', letterSpacing: '-0.01em' }}>
-              Player Activity
+              {t.chart.title}
             </h2>
             <span style={{
               fontSize: '10px',
@@ -80,30 +90,30 @@ export default function PlayerActivityChart({ data, nowCount = 42 }) {
               backgroundColor: 'var(--border-primary)',
               color: 'var(--text-secondary)'
             }}>
-              24 HOURS
+              24H
             </span>
           </div>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Live concurrent player lifecycle and distribution
+            {t.chart.subtitle}
           </p>
         </div>
 
         {/* podsumowanie statystyk w prawym gornym rogu */}
         <div style={{ display: 'flex', gap: '16px', textAlign: 'right' }}>
           <div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>NOW</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{t.chart.liveNow.toUpperCase()}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }} className="num-tabular">
               {nowCount}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>PEAK</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{t.chart.peak.toUpperCase()}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#c4b5fd' }} className="num-tabular">
               118 <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>(21:00)</span>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>AVG</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{t.chart.average.toUpperCase()}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }} className="num-tabular">
               54
             </div>

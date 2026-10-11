@@ -14,8 +14,14 @@ import {
   ShieldCheck,
   CheckCircle2,
   LogOut,
-  ListChecks
+  ListChecks,
+  AlertTriangle,
+  AlertCircle,
+  ArrowRight,
+  XCircle
 } from 'lucide-react';
+
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function Header({
   serverInfo,
@@ -29,58 +35,60 @@ export default function Header({
   onCopyIp,
   onNavigateTab
 }) {
+  const { t, lang, setLang } = useLanguage();
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
 
   const tabMetadata = {
     dashboard: {
-      title: 'Dashboard',
-      subtitle: 'Monitor your server and manage active players in real time.',
+      title: t.header.tabs.dashboard.title,
+      subtitle: t.header.tabs.dashboard.subtitle,
       subPath: 'control-plane'
     },
     players: {
-      title: 'Player Management',
-      subtitle: 'Monitor live connected participants, duty assignments, and player states.',
+      title: t.header.tabs.players.title,
+      subtitle: t.header.tabs.players.subtitle,
       subPath: 'players'
     },
     moderation: {
-      title: 'Moderation & Enforcement',
-      subtitle: 'Enforce server rules, txAdmin banlist, and player sanctions.',
+      title: t.header.tabs.moderation.title,
+      subtitle: t.header.tabs.moderation.subtitle,
       subPath: 'moderation'
     },
     resources: {
-      title: 'Resource Orchestrator',
-      subtitle: 'Manage FXServer manifests, Lua heaps, and script execution states.',
+      title: t.header.tabs.resources.title,
+      subtitle: t.header.tabs.resources.subtitle,
       subPath: 'resources'
     },
     server: {
-      title: 'Server Telemetry & Performance',
-      subtitle: 'Low-level node metrics, OneSync routing buckets, and thread diagnostics.',
+      title: t.header.tabs.server.title,
+      subtitle: t.header.tabs.server.subtitle,
       subPath: 'telemetry'
     },
     logs: {
-      title: 'Console & Live Logs',
-      subtitle: 'Interactive FXServer master console (RCON) and audit event stream.',
+      title: t.header.tabs.logs.title,
+      subtitle: t.header.tabs.logs.subtitle,
       subPath: 'console'
     },
     settings: {
-      title: 'Control Plane Settings',
-      subtitle: 'Server configuration, txAdmin bridges, API tokens, and Discord webhooks.',
+      title: t.header.tabs.settings.title,
+      subtitle: t.header.tabs.settings.subtitle,
       subPath: 'settings'
     },
     admins: {
-      title: 'Staff & Administrator Roster',
-      subtitle: 'Manage administrative roles, access control lists, and 2FA credentials.',
+      title: t.header.tabs.admins.title,
+      subtitle: t.header.tabs.admins.subtitle,
       subPath: 'admins'
     },
     checklist: {
-      title: 'Production Deployment Checklist',
-      subtitle: 'Vercel-style pre-flight verification: secure tokens, root credentials, and bridge secrets.',
+      title: t.header.tabs.checklist.title,
+      subtitle: t.header.tabs.checklist.subtitle,
       subPath: 'deployment-checklist'
     }
   };
 
   const currentTab = tabMetadata[activeTab] || tabMetadata.dashboard;
+  const isConnected = serverInfo?.status === 'ONLINE';
 
   const notifications = [
     { id: 1, title: 'txAdmin auto-saved', text: 'World player state synced successfully', time: '1m ago' },
@@ -150,7 +158,7 @@ export default function Header({
             }}
           >
             <ListChecks size={13} color="var(--brand-purple)" />
-            <span>Pre-flight Checklist</span>
+            <span>{t.header.preflightPill}</span>
           </button>
 
           {/* odznaka statusu serwera */}
@@ -158,20 +166,67 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: 'var(--surface-panel)',
-            border: '1px solid var(--border-primary)',
+            backgroundColor: isConnected ? 'var(--surface-panel)' : 'rgba(239, 68, 68, 0.12)',
+            border: isConnected ? '1px solid var(--border-primary)' : '1px solid rgba(239, 68, 68, 0.35)',
             padding: '5px 12px',
             borderRadius: '9999px',
             fontSize: '11px',
             fontWeight: 600,
             letterSpacing: '0.04em'
           }}>
-            <span className="live-pulse-dot" />
-            <span style={{ color: 'var(--status-success)', fontWeight: 700 }}>ONLINE</span>
-            <span style={{ color: 'var(--text-muted)' }}>|</span>
-            <span style={{ color: 'var(--text-primary)' }} className="num-tabular">
-              {serverInfo.onlinePlayers} / {serverInfo.maxPlayers} PLAYERS
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isConnected ? 'var(--status-success)' : 'var(--status-danger)',
+              boxShadow: isConnected ? '0 0 8px var(--status-success)' : '0 0 8px var(--status-danger)',
+              display: 'inline-block'
+            }} />
+            <span style={{ color: isConnected ? 'var(--status-success)' : 'var(--status-danger)', fontWeight: 700 }}>
+              {isConnected ? t.header.online : 'OFFLINE'}
             </span>
+            <span style={{ color: 'var(--text-muted)' }}>|</span>
+            <span style={{ color: isConnected ? 'var(--text-primary)' : 'var(--text-muted)' }} className="num-tabular">
+              {serverInfo?.onlinePlayers || 0} / {serverInfo?.maxPlayers || 0} {t.header.playersCount}
+            </span>
+          </div>
+
+          {/* przelacznik jezyka w headerze */}
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button
+              type="button"
+              onClick={() => setLang('pl')}
+              title="Język Polski"
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontWeight: 600,
+                borderRadius: '5px',
+                border: lang === 'pl' ? '1px solid var(--brand-purple)' : '1px solid var(--border-primary)',
+                backgroundColor: lang === 'pl' ? 'rgba(124, 58, 237, 0.22)' : 'var(--surface-panel)',
+                color: lang === 'pl' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              PL
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang('en')}
+              title="English"
+              style={{
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontWeight: 600,
+                borderRadius: '5px',
+                border: lang === 'en' ? '1px solid var(--brand-purple)' : '1px solid var(--border-primary)',
+                backgroundColor: lang === 'en' ? 'rgba(124, 58, 237, 0.22)' : 'var(--surface-panel)',
+                color: lang === 'en' ? '#fff' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              EN
+            </button>
           </div>
 
           {/* dzwoneczek powiadomien */}
@@ -194,7 +249,7 @@ export default function Header({
                 position: 'relative',
                 transition: 'border-color 0.15s ease'
               }}
-              title="Notifications"
+              title={t.header.notifications}
             >
               <Bell size={16} />
               {unreadCount > 0 && (
@@ -232,8 +287,8 @@ export default function Header({
                   borderBottom: '1px solid var(--border-subtle)',
                   paddingBottom: '8px'
                 }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>Notifications</span>
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>All caught up</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{t.header.notifications}</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{t.header.noNotifications}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {notifications.map((n) => (
@@ -297,7 +352,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={onLogout}
-                title="Wyloguj / Log out"
+                title={t.header.logout}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -357,7 +412,7 @@ export default function Header({
             style={{ opacity: isRefreshing ? 0.7 : 1 }}
           >
             <RefreshCw size={14} className={isRefreshing ? 'anim-spin' : ''} />
-            <span>Refresh Data</span>
+            <span>{t.header.refreshTelemetry}</span>
           </button>
 
           <button
@@ -365,7 +420,7 @@ export default function Header({
             className="btn-primary"
           >
             <Zap size={14} fill="#fff" />
-            <span>Quick Actions</span>
+            <span>{t.header.quickActions}</span>
             <ChevronDown size={14} />
           </button>
         </div>

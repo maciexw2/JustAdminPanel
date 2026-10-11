@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { Shield, Lock, User, ArrowRight, Eye, EyeOff, AlertCircle, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function LoginScreen({ onLogin }) {
+  const { lang, setLang } = useLanguage();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
@@ -11,7 +13,6 @@ export default function LoginScreen({ onLogin }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDiscordLoading, setIsDiscordLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [lang, setLang] = useState('pl');
 
   const text = {
     pl: {

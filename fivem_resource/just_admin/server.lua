@@ -115,6 +115,30 @@ SetHttpHandler(function(req, res)
         return sendJson(res, 200, playersList)
     end
 
+    if req.method == 'GET' and path == '/resources' then
+        local resourceList = {}
+        local count = GetNumResources()
+        for i = 0, count - 1 do
+            local resName = GetResourceByFindIndex(i)
+            if resName then
+                local state = GetResourceState(resName)
+                local author = GetResourceMetadata(resName, 'author', 0) or 'Cfx.re Community'
+                local version = GetResourceMetadata(resName, 'version', 0) or '1.0.0'
+                local description = GetResourceMetadata(resName, 'description', 0) or resName
+                table.insert(resourceList, {
+                    name = resName,
+                    author = author .. ' (' .. version .. ')',
+                    type = string.sub(resName, 1, 4) == 'fxv_' and 'Gamemode' or 'Standalone Script',
+                    status = (state == 'started') and 'started' or 'stopped',
+                    memoryKb = 120,
+                    version = version,
+                    description = description
+                })
+            end
+        end
+        return sendJson(res, 200, resourceList)
+    end
+
     if req.method == 'POST' and path == '/action' then
         req.setDataHandler(function(body)
             local data = json.decode(body) or {}

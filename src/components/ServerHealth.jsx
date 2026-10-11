@@ -2,18 +2,21 @@
 
 import React from 'react';
 import { ArrowUpRight, ArrowDownLeft, Cpu, HardDrive, Network } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ServerHealth({ hardware }) {
+  const { t } = useLanguage();
+
   return (
     <div className="panel-card anim-slide-right delay-2" style={{ padding: '20px 22px', flex: '1 1 38%', minWidth: '340px' }}>
       {/* naglowek */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
         <div>
           <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', letterSpacing: '-0.01em' }}>
-            Server Health
+            {t.health.title}
           </h2>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Node hardware metrics & orchestration
+            {t.health.subtitle}
           </p>
         </div>
 
@@ -30,7 +33,7 @@ export default function ServerHealth({ hardware }) {
           border: '1px solid var(--status-success-border)'
         }}>
           <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--status-success)' }} />
-          <span>Normal</span>
+          <span>{t.health.statusNormal}</span>
         </div>
       </div>
 
@@ -41,7 +44,7 @@ export default function ServerHealth({ hardware }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
               <Cpu size={14} color="#a1a1aa" />
-              <span>CPU Utilization</span>
+              <span>{t.health.cpuUtil}</span>
             </div>
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }} className="num-tabular">
               {hardware.cpuUsage}%
@@ -82,7 +85,7 @@ export default function ServerHealth({ hardware }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
               <HardDrive size={14} color="#a1a1aa" />
-              <span>RAM Footprint</span>
+              <span>{t.health.ramUtil}</span>
             </div>
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }} className="num-tabular">
               {hardware.ramPercent}%
@@ -113,8 +116,8 @@ export default function ServerHealth({ hardware }) {
             color: 'var(--text-muted)',
             marginTop: '5px'
           }}>
-            <span className="num-tabular">{hardware.ramUsedGb} GB In-Use</span>
-            <span className="num-tabular">{hardware.ramTotalGb} GB Total</span>
+            <span className="num-tabular">{hardware.ramUsedGb} GB / {hardware.ramTotalGb} GB</span>
+            <span className="num-tabular">{hardware.ramPercent}%</span>
           </div>
         </div>
 
@@ -133,7 +136,7 @@ export default function ServerHealth({ hardware }) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
               <ArrowUpRight size={13} color="#3b82f6" />
-              <span>Outbound</span>
+              <span>{t.metrics.outboundNet}</span>
             </div>
             <div style={{ fontSize: '15px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
               {hardware.outboundMbps} <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>Mbps</span>
@@ -147,8 +150,8 @@ export default function ServerHealth({ hardware }) {
             padding: '10px 12px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
-              <ArrowDownLeft size={13} color="#22c55e" />
-              <span>Inbound</span>
+              <ArrowDownLeft size={13} color="#10b981" />
+              <span>{t.metrics.inboundNet}</span>
             </div>
             <div style={{ fontSize: '15px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
               {hardware.inboundMbps} <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>Mbps</span>

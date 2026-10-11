@@ -13,32 +13,28 @@ import {
   Sliders,
   RotateCw
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ServerTab({ serverInfo, hardware, onToast }) {
+  const { t } = useLanguage();
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [syncRate, setSyncRate] = useState('50ms');
+  const isOnline = serverInfo?.status === 'ONLINE';
 
-  const cores = [
-    { id: 0, load: 38 },
-    { id: 1, load: 45 },
-    { id: 2, load: 29 },
-    { id: 3, load: 33 },
-    { id: 4, load: 22 },
-    { id: 5, load: 41 },
-    { id: 6, load: 30 },
-    { id: 7, load: 35 }
-  ];
+  const baseLoad = isOnline ? (hardware?.cpuUsage || 15) : 0;
+  const cores = Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    load: isOnline ? Math.max(0, Math.min(100, Math.round(baseLoad + ((i % 3) * 4) - 2))) : 0
+  }));
 
-  const routingBuckets = [
-    { id: 0, name: 'Default World (Los Santos)', count: 38, population: 'High' },
-    { id: 1, name: 'Apartment Complex (Instance #1)', count: 2, population: 'Isolated' },
-    { id: 2, name: 'Bolingbroke Prison (Holding Cell)', count: 2, population: 'Isolated' }
-  ];
+  const routingBuckets = isOnline ? [
+    { id: 0, name: 'Default World (Los Santos)', count: serverInfo?.onlinePlayers || 0, population: serverInfo?.onlinePlayers > 0 ? 'High' : 'Empty' }
+  ] : [];
 
   const handleToggleMaintenance = () => {
     const newState = !maintenanceMode;
     setMaintenanceMode(newState);
-    onToast?.(newState ? 'Server maintenance mode ACTIVATED. Connections locked.' : 'Server maintenance mode DEACTIVATED.');
+    onToast?.(newState ? 'Server maintenance mode ACTIVATED.' : 'Server maintenance mode DEACTIVATED.');
   };
 
   return (
@@ -50,27 +46,27 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
         gap: '12px'
       }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Tick Frame Rate</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.serverTab.statFps}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-success)', marginTop: '4px' }} className="num-tabular">
             {serverInfo.fps} FPS <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>· {serverInfo.tickTimeMs}ms</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>OneSync Architecture</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.serverTab.statOnesync}</div>
           <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff', marginTop: '4px' }}>
             BigMode <span style={{ fontSize: '12px', color: '#c4b5fd', fontWeight: 500 }}>(128 slots)</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Network IOPS</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.serverTab.statNetIo}</div>
           <div style={{ fontSize: '20px', fontWeight: 700, color: '#60a5fa', marginTop: '4px' }} className="num-tabular">
-            {hardware.outboundMbps} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Mbps Out</span> / {hardware.inboundMbps} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>In</span>
+            {hardware.outboundMbps} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Mbps</span> / {hardware.inboundMbps} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Mbps</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Node Health Index</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.serverTab.statHealth}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#4ade80', marginTop: '4px' }}>
-            99.98% <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>uptime</span>
+            99.98%
           </div>
         </div>
       </div>
@@ -82,7 +78,7 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                CPU Multi-Core Distribution
+                {t.serverTab.cpuTitle}
               </h3>
               <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                 {hardware.cpuModel} @ {hardware.cpuClock}
@@ -118,10 +114,10 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                RAM Allocation Layers
+                {t.serverTab.ramTitle}
               </h3>
               <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                Total Allocated: {hardware.ramUsedGb} GB / {hardware.ramTotalGb} GB ({hardware.ramPercent}%)
+                {t.serverTab.totalAllocated}: {hardware.ramUsedGb} GB / {hardware.ramTotalGb} GB ({hardware.ramPercent}%)
               </p>
             </div>
           </div>
@@ -156,24 +152,31 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
       <div className="panel-card anim-slide-up delay-3" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
           <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-            OneSync Routing Buckets (Dimension Isolation)
+            {t.serverTab.routingBuckets}
           </h3>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Isolated entity synchronization partitions
+            {t.serverTab.routingSubtitle}
           </p>
         </div>
 
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--surface-subtle)', color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase' }}>
-              <th style={{ padding: '10px 18px' }}>BUCKET ID</th>
-              <th style={{ padding: '10px 16px' }}>DIMENSION NAME</th>
-              <th style={{ padding: '10px 16px' }}>ACTIVE PLAYERS</th>
-              <th style={{ padding: '10px 18px', textAlign: 'right' }}>ISOLATION TYPE</th>
+              <th style={{ padding: '10px 18px' }}>{t.serverTab.thBucketId}</th>
+              <th style={{ padding: '10px 16px' }}>{t.serverTab.thDimensionName}</th>
+              <th style={{ padding: '10px 16px' }}>{t.serverTab.thPlayers}</th>
+              <th style={{ padding: '10px 18px', textAlign: 'right' }}>{t.serverTab.thIsolation}</th>
             </tr>
           </thead>
           <tbody>
-            {routingBuckets.map((b, idx) => (
+            {routingBuckets.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={{ padding: '32px 18px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  {isOnline ? 'Brak aktywnych partycji routing buckets' : 'Brak połączenia z silnikiem FiveM (Wymiary OneSync niedostępne)'}
+                </td>
+              </tr>
+            ) : (
+              routingBuckets.map((b, idx) => (
               <tr
                 key={b.id}
                 className="interactive-row anim-row-stagger"
@@ -189,13 +192,13 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
                   {b.name}
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <span style={{ fontWeight: 600, color: '#4ade80' }}>{b.count}</span> players
+                  <span style={{ fontWeight: 600, color: '#4ade80' }}>{b.count}</span> {t.serverTab.playersUnit}
                 </td>
                 <td style={{ padding: '12px 18px', textAlign: 'right', color: 'var(--text-muted)' }}>
                   {b.population}
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>

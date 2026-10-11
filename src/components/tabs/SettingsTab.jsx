@@ -165,8 +165,10 @@ const dict = {
   }
 };
 
+import { useLanguage } from '@/lib/LanguageContext';
+
 export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
-  const [lang, setLang] = useState('pl');
+  const { lang, setLang } = useLanguage();
 
   const [formData, setFormData] = useState({
     fivemEndpoint: 'http://127.0.0.1:30120/just_admin',
@@ -206,10 +208,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
 
   useEffect(() => {
     try {
-      const savedLang = localStorage.getItem('just_admin_lang');
-      if (savedLang === 'en' || savedLang === 'pl') {
-        setLang(savedLang);
-      }
       const savedTheme = localStorage.getItem('just_admin_theme');
       if (savedTheme) {
         const parsed = JSON.parse(savedTheme);
@@ -271,13 +269,10 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
 
   const changeLanguage = (newLang) => {
     setLang(newLang);
-    try {
-      localStorage.setItem('just_admin_lang', newLang);
-    } catch {}
     onToast?.(newLang === 'pl' ? 'Ustawiono język Polski' : 'Switched to English');
   };
 
-  const t = dict[lang];
+  const t = dict[lang] || dict.pl;
 
   const handleTestConnection = async () => {
     setTestingConnection(true);
@@ -423,7 +418,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
         </div>
       </div>
 
-      {/* Vercel Pre-flight Checklist Banner */}
       <div className="panel-card anim-slide-down" style={{
         padding: '16px 20px',
         background: 'linear-gradient(135deg, rgba(20, 20, 24, 0.95) 0%, rgba(124, 58, 237, 0.12) 100%)',

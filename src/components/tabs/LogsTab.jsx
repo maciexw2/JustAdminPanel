@@ -12,6 +12,7 @@ import {
   Filter,
   CheckCircle2
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const initialLogs = [
   { id: 1, type: 'server', time: '20:30:11', text: '[FXServer] Process spawned with PID 28419 (64-bit Linux)' },
@@ -26,6 +27,7 @@ const initialLogs = [
 ];
 
 export default function LogsTab({ onToast }) {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState(initialLogs);
   const [filterType, setFilterType] = useState('ALL');
   const [search, setSearch] = useState('');
@@ -155,12 +157,18 @@ export default function LogsTab({ onToast }) {
       <div className="panel-card anim-slide-up delay-1" style={{ padding: '12px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         {/* pigulki filtrow */}
         <div style={{ display: 'flex', gap: '6px' }}>
-          {['ALL', 'SERVER', 'TXADMIN', 'CHAT', 'WARN'].map((pill) => {
-            const active = filterType === pill;
+          {[
+            { id: 'ALL', label: t.logsTab.filterAll },
+            { id: 'SERVER', label: t.logsTab.filterServer },
+            { id: 'TXADMIN', label: t.logsTab.filterTxAdmin },
+            { id: 'CHAT', label: t.logsTab.filterChat },
+            { id: 'WARN', label: t.logsTab.filterWarn }
+          ].map((pill) => {
+            const active = filterType === pill.id;
             return (
               <button
-                key={pill}
-                onClick={() => setFilterType(pill)}
+                key={pill.id}
+                onClick={() => setFilterType(pill.id)}
                 style={{
                   fontSize: '11px',
                   fontWeight: active ? 600 : 500,
@@ -171,7 +179,7 @@ export default function LogsTab({ onToast }) {
                   border: `1px solid ${active ? 'var(--brand-purple)' : 'var(--border-subtle)'}`
                 }}
               >
-                {pill}
+                {pill.label}
               </button>
             );
           })}
@@ -193,7 +201,7 @@ export default function LogsTab({ onToast }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search log lines..."
+            placeholder={t.logsTab.searchPlaceholder}
             style={{
               background: 'none',
               border: 'none',
@@ -227,17 +235,17 @@ export default function LogsTab({ onToast }) {
               borderColor: autoScroll ? 'var(--brand-purple)' : 'var(--border-subtle)'
             }}
           >
-            <span>Auto-scroll {autoScroll ? 'ON' : 'OFF'}</span>
+            <span>{t.logsTab.autoScroll} {autoScroll ? 'ON' : 'OFF'}</span>
           </button>
 
           <button
             onClick={() => setLogs([])}
             className="btn-secondary"
             style={{ height: '30px', fontSize: '11.5px', padding: '0 10px' }}
-            title="Clear"
+            title={t.logsTab.clear}
           >
             <Trash2 size={13} />
-            <span>Clear</span>
+            <span>{t.logsTab.clear}</span>
           </button>
 
           <button
@@ -246,7 +254,7 @@ export default function LogsTab({ onToast }) {
             style={{ height: '30px', fontSize: '11.5px', padding: '0 10px' }}
           >
             <Download size={13} />
-            <span>Export</span>
+            <span>{t.logsTab.export}</span>
           </button>
         </div>
       </div>
@@ -319,7 +327,7 @@ export default function LogsTab({ onToast }) {
             type="text"
             value={cmdInput}
             onChange={(e) => setCmdInput(e.target.value)}
-            placeholder="Enter command (status, say [text], ensure [res], help)..."
+            placeholder={t.logsTab.sendCmdPlaceholder}
             style={{
               flex: 1,
               backgroundColor: 'transparent',
@@ -332,7 +340,7 @@ export default function LogsTab({ onToast }) {
           />
           <button type="submit" className="btn-primary" style={{ height: '30px', padding: '0 12px', fontSize: '11.5px' }}>
             <CornerDownLeft size={13} />
-            <span>Send</span>
+            <span>{t.logsTab.send}</span>
           </button>
         </form>
       </div>

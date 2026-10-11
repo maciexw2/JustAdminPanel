@@ -17,8 +17,10 @@ import {
   Sparkles,
   AlertTriangle
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function PlayerInspectModal({ player, isOpen, onClose, onKick, onBan, onToast }) {
+  const { t } = useLanguage();
   const [banReason, setBanReason] = useState('Cheating / Suspicious lua executor injection');
   const [showBanConfirm, setShowBanConfirm] = useState(false);
 
@@ -131,7 +133,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
                 <Wifi size={13} color="var(--status-success)" />
-                <span>Ping</span>
+                <span>{t.modals.inspect.ping}</span>
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
                 {player.ping}ms
@@ -146,7 +148,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
                 <Clock size={13} color="#3b82f6" />
-                <span>Session</span>
+                <span>{t.modals.inspect.sessionTime}</span>
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
                 {player.sessionDuration}
@@ -161,7 +163,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
                 <Wallet size={13} color="#22c55e" />
-                <span>Cash</span>
+                <span>{t.modals.inspect.cash}</span>
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#4ade80', marginTop: '4px' }} className="num-tabular">
                 {player.cash}
@@ -176,7 +178,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: 'var(--text-muted)' }}>
                 <Building2 size={13} color="#c4b5fd" />
-                <span>Bank</span>
+                <span>{t.modals.inspect.bank}</span>
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
                 {player.bank}
@@ -189,7 +191,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', marginBottom: '5px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#f87171' }}>
-                  <Heart size={13} fill="#ef4444" /> Health
+                  <Heart size={13} fill="#ef4444" /> {t.modals.inspect.healthArmor.split(' ')[0]}
                 </span>
                 <span style={{ fontWeight: 600, color: '#fff' }} className="num-tabular">{player.health}%</span>
               </div>
@@ -222,7 +224,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             gap: '8px'
           }}>
             <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
-              AUTHENTICATION & IDENTIFIERS
+              {t.modals.inspect.serverIdentifiers.toUpperCase()}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6px', fontSize: '11.5px', fontFamily: 'var(--font-mono)' }}>
@@ -235,7 +237,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
                 <span style={{ color: 'var(--text-secondary)' }}>{player.license}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Location:</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t.modals.inspect.coords}:</span>
                 <span style={{ color: 'var(--text-secondary)' }}>{player.coords}</span>
               </div>
             </div>
@@ -251,10 +253,10 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '13px' }}>
                 <AlertTriangle size={16} />
-                <span>Confirm Permanent Server Ban</span>
+                <span>{t.modals.inspect.confirmBan}</span>
               </div>
               <p style={{ fontSize: '12px', color: '#fca5a5', marginTop: '4px' }}>
-                Player {player.name} will be immediately disconnected and added to txAdmin banlist.
+                {t.modals.inspect.banPlayer} ({player.name})
               </p>
               <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
                 <button
@@ -262,14 +264,14 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
                   className="btn-danger"
                   style={{ height: '30px' }}
                 >
-                  Confirm Ban
+                  {t.modals.inspect.confirmBan}
                 </button>
                 <button
                   onClick={() => setShowBanConfirm(false)}
                   className="btn-secondary"
                   style={{ height: '30px' }}
                 >
-                  Cancel
+                  Anuluj
                 </button>
               </div>
             </div>
@@ -288,11 +290,11 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
             <div style={{ display: 'flex', gap: '8px' }}>
               <button onClick={handleRevive} className="btn-secondary" style={{ fontSize: '12px', height: '32px' }}>
                 <Sparkles size={13} color="#22c55e" />
-                <span>Revive / Heal</span>
+                <span>{t.modals.inspect.reviveHeal}</span>
               </button>
               <button onClick={handleTeleport} className="btn-secondary" style={{ fontSize: '12px', height: '32px' }}>
                 <Crosshair size={13} color="#3b82f6" />
-                <span>Teleport</span>
+                <span>{t.modals.inspect.teleportTo}</span>
               </button>
             </div>
 
@@ -303,7 +305,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
                 style={{ fontSize: '12px', height: '32px', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.3)' }}
               >
                 <UserX size={13} />
-                <span>Kick</span>
+                <span>{t.modals.inspect.kickPlayer}</span>
               </button>
               <button
                 onClick={() => setShowBanConfirm(true)}
@@ -311,7 +313,7 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
                 style={{ fontSize: '12px', height: '32px' }}
               >
                 <Gavel size={13} />
-                <span>Ban</span>
+                <span>{t.modals.inspect.banPlayer}</span>
               </button>
             </div>
           </div>

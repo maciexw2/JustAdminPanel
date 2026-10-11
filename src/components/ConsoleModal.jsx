@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, X, CornerDownLeft, Trash2, Shield, Circle } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ConsoleModal({ isOpen, onClose, onToast }) {
+  const { t } = useLanguage();
   const [inputVal, setInputVal] = useState('');
   const [history, setHistory] = useState([
     { id: 1, type: 'info', time: '20:31:02', text: '[FXServer] Server initialized on port 30120 (OneSync BigMode: active)' },
@@ -96,7 +98,7 @@ export default function ConsoleModal({ isOpen, onClose, onToast }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Terminal size={16} color="var(--brand-purple)" />
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>
-              FXServer Master Console (RCON)
+              {t.modals.console.title}
             </span>
             <span style={{
               fontSize: '10px',
@@ -115,7 +117,7 @@ export default function ConsoleModal({ isOpen, onClose, onToast }) {
             <button
               onClick={() => setHistory([])}
               style={{ color: 'var(--text-muted)', padding: '4px', borderRadius: '4px' }}
-              title="Clear terminal"
+              title={t.modals.console.clear}
             >
               <Trash2 size={14} />
             </button>
@@ -182,7 +184,7 @@ export default function ConsoleModal({ isOpen, onClose, onToast }) {
             type="text"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
-            placeholder="Type command (try: status, say hello, help)..."
+            placeholder={t.modals.console.placeholder}
             style={{
               flex: 1,
               backgroundColor: 'transparent',

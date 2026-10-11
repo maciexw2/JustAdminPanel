@@ -2,14 +2,16 @@
 
 import React, { useState } from 'react';
 import { Server, Terminal, Copy, Check } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ServerFooterBanner({ serverInfo, onOpenConsole, onToast }) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard?.writeText?.(serverInfo.endpoint);
     setCopied(true);
-    onToast?.(`Copied server endpoint: ${serverInfo.endpoint}`);
+    onToast?.(`${t.footer.copied} (${serverInfo.endpoint})`);
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -45,7 +47,7 @@ export default function ServerFooterBanner({ serverInfo, onOpenConsole, onToast 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>
-              FiveM Server Engine:
+              {t.footer.engine}
             </span>
             <span style={{
               fontSize: '12px',
@@ -68,7 +70,7 @@ export default function ServerFooterBanner({ serverInfo, onOpenConsole, onToast 
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span>Endpoint: <strong style={{ color: 'var(--text-secondary)' }}>{serverInfo.endpoint}</strong></span>
+            <span>{t.footer.endpoint} <strong style={{ color: 'var(--text-secondary)' }}>{serverInfo.endpoint}</strong></span>
             <span>·</span>
             <span>txAdmin {serverInfo.txAdminVersion}</span>
             <span>·</span>
@@ -85,7 +87,7 @@ export default function ServerFooterBanner({ serverInfo, onOpenConsole, onToast 
           style={{ height: '32px', fontSize: '12px' }}
         >
           {copied ? <Check size={13} color="var(--status-success)" /> : <Copy size={13} />}
-          <span>{copied ? 'Copied!' : 'Copy IP:PORT'}</span>
+          <span>{copied ? t.footer.copied : t.footer.copyEndpoint}</span>
         </button>
 
         <button
@@ -94,7 +96,7 @@ export default function ServerFooterBanner({ serverInfo, onOpenConsole, onToast 
           style={{ height: '32px', fontSize: '12px' }}
         >
           <Terminal size={13} />
-          <span>Open Console</span>
+          <span>{t.footer.quickConsole}</span>
         </button>
       </div>
     </div>

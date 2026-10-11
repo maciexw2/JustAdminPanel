@@ -15,8 +15,10 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onBanPlayer, onToast }) {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [sortBy, setSortBy] = useState('id');
@@ -69,27 +71,27 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
         gap: '12px'
       }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Connected Players</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.playersTab.statConnected}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
-            {players.length} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>/ 128 slots</span>
+            {players.length} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>/ 128 {t.playersTab.slots}</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Police on Duty</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.playersTab.statPolice}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#60a5fa', marginTop: '4px' }} className="num-tabular">
-            {roleCounts.police} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>units active</span>
+            {roleCounts.police} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>{t.playersTab.unitsActive}</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>EMS Paramedics</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.playersTab.statEms}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#f87171', marginTop: '4px' }} className="num-tabular">
-            {roleCounts.ems} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>on duty</span>
+            {roleCounts.ems} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>{t.playersTab.onDuty}</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Benny's Mechanics</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.playersTab.statMechanics}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fbbf24', marginTop: '4px' }} className="num-tabular">
-            {roleCounts.mechanic} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>in garage</span>
+            {roleCounts.mechanic} <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 400 }}>{t.playersTab.inGarage}</span>
           </div>
         </div>
       </div>
@@ -112,7 +114,7 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by player, ID, job, or license..."
+            placeholder={t.playersTab.searchPlaceholder}
             style={{
               background: 'none',
               border: 'none',
@@ -127,11 +129,11 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
         {/* chipy filtrowania rol */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {[
-            { id: 'all', label: `All (${roleCounts.all})` },
-            { id: 'police', label: `Police (${roleCounts.police})` },
-            { id: 'ems', label: `EMS (${roleCounts.ems})` },
-            { id: 'mechanic', label: `Mechanic (${roleCounts.mechanic})` },
-            { id: 'civilian', label: `Civilians (${roleCounts.civilian})` }
+            { id: 'all', label: `${t.playersTab.allRoles} (${roleCounts.all})` },
+            { id: 'police', label: `${t.playersTab.police} (${roleCounts.police})` },
+            { id: 'ems', label: `${t.playersTab.ems} (${roleCounts.ems})` },
+            { id: 'mechanic', label: `${t.playersTab.mechanic} (${roleCounts.mechanic})` },
+            { id: 'civilian', label: `${t.playersTab.civilian} (${roleCounts.civilian})` }
           ].map((chip) => {
             const active = filterRole === chip.id;
             return (
@@ -171,9 +173,9 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
               outline: 'none'
             }}
           >
-            <option value="id">Server ID</option>
-            <option value="ping">Lowest Ping</option>
-            <option value="name">Name A-Z</option>
+            <option value="id">{t.playersTab.sortById}</option>
+            <option value="ping">{t.playersTab.sortByPing}</option>
+            <option value="name">{t.playersTab.sortByName}</option>
           </select>
         </div>
       </div>
@@ -191,14 +193,14 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
               letterSpacing: '0.06em',
               textTransform: 'uppercase'
             }}>
-              <th style={{ padding: '12px 18px', width: '60px' }}>ID</th>
-              <th style={{ padding: '12px 16px' }}>PLAYER</th>
-              <th style={{ padding: '12px 16px' }}>ROLE / DUTY</th>
-              <th style={{ padding: '12px 16px' }}>PING</th>
-              <th style={{ padding: '12px 16px' }}>SESSION</th>
-              <th style={{ padding: '12px 16px' }}>FINANCES</th>
-              <th style={{ padding: '12px 16px' }}>HEALTH / ARMOR</th>
-              <th style={{ padding: '12px 18px', textAlign: 'right' }}>MODERATION</th>
+              <th style={{ padding: '12px 18px', width: '60px' }}>{t.playersTab.thId}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thPlayer}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thRole}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thPing}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thSession}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thFinances}</th>
+              <th style={{ padding: '12px 16px' }}>{t.playersTab.thHealth}</th>
+              <th style={{ padding: '12px 18px', textAlign: 'right' }}>{t.playersTab.thModeration}</th>
             </tr>
           </thead>
           <tbody>
@@ -319,7 +321,7 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
                         className="btn-secondary"
                         style={{ height: '28px', padding: '0 8px', fontSize: '11.5px' }}
                       >
-                        Inspect
+                        {t.playersTab.btnInspect}
                       </button>
                       <button
                         onClick={() => {

@@ -12,8 +12,10 @@ import {
   AlertTriangle,
   Server
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenConsole }) {
+  const { t } = useLanguage();
   const [announcement, setAnnouncement] = useState('');
   const [isRestarting, setIsRestarting] = useState(false);
 
@@ -64,7 +66,7 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Zap size={16} color="var(--brand-purple)" fill="var(--brand-purple)" />
             <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-              txAdmin Quick Actions
+              {t.modals.quickActions.title}
             </span>
           </div>
 
@@ -81,14 +83,14 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
           {/* ogloszenie globalne */}
           <div>
             <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-              Broadcast Announcement
+              {t.modals.quickActions.announcementTitle}
             </label>
             <form onSubmit={handleSendAnnouncement} style={{ display: 'flex', gap: '8px' }}>
               <input
                 type="text"
                 value={announcement}
                 onChange={(e) => setAnnouncement(e.target.value)}
-                placeholder="Global message to all active players..."
+                placeholder={t.modals.quickActions.announcementPlaceholder}
                 style={{
                   flex: 1,
                   backgroundColor: 'var(--surface-subtle)',
@@ -102,7 +104,7 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
               />
               <button type="submit" className="btn-primary" style={{ height: '33px' }}>
                 <Send size={13} />
-                <span>Send</span>
+                <span>{t.modals.quickActions.sendBroadcast}</span>
               </button>
             </form>
           </div>
@@ -117,8 +119,8 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
             >
               <RotateCcw size={16} color="#fbbf24" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>Restart in 60s</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Warn players before reboot</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>{t.modals.quickActions.restartServer} (60s)</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>txAdmin restart</div>
               </div>
             </button>
 
@@ -129,8 +131,8 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
             >
               <Trash2 size={16} color="#60a5fa" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>Clear Cache</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Purge FXServer cache dir</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>{t.modals.quickActions.clearCache}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>FXServer cache</div>
               </div>
             </button>
 
@@ -141,8 +143,8 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
             >
               <Lock size={16} color="#ef4444" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>Toggle Whitelist</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Lock server to staff only</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>{t.modals.quickActions.lockdown}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Whitelist / Staff only</div>
               </div>
             </button>
 
@@ -156,8 +158,8 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
             >
               <Server size={16} color="var(--brand-purple)" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>Interactive RCON</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Open server console shell</div>
+                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>{t.modals.quickActions.openConsole}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>FXServer master shell</div>
               </div>
             </button>
           </div>

@@ -11,7 +11,7 @@ Lekki i nowoczesny panel webowy do zarzadzania serwerem bardzo dobry zamiennik t
 Dziala bezposrednio na glownym porcie FiveM (30120) przez wbudowany http handler wiec nie musisz stawiac zewnetrznych baz danych ani otwierac kolejnych portow na maszynie.
 
 <p align="center">
-  <img src="docs/dashboard-preview.jpg" alt="Dashboard Preview" width="100%" />
+  <img src="docs/dashboard-preview.png" alt="Dashboard Preview" width="100%" />
 </p>
 
 ## Co potrafi
@@ -28,7 +28,7 @@ Dziala bezposrednio na glownym porcie FiveM (30120) przez wbudowany http handler
 
 | Dashboard | Ustawienia i most |
 |---|---|
-| <img src="docs/dashboard-preview.jpg" width="100%" /> | <img src="docs/settings-preview.jpg" width="100%" /> |
+| <img src="docs/dashboard-preview.png" width="100%" /> | <img src="docs/settings-preview.png" width="100%" /> |
 
 ## Jak to dziala
 

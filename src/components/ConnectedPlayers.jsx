@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { ChevronRight, Search, Shield, Eye } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ConnectedPlayers({ players, onInspectPlayer, onViewAll }) {
+  const { t } = useLanguage();
   const [showAll, setShowAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -66,10 +68,10 @@ export default function ConnectedPlayers({ players, onInspectPlayer, onViewAll }
       }}>
         <div>
           <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', letterSpacing: '-0.01em' }}>
-            Connected Players
+            {t.connected.title}
           </h2>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Live session participants and duty assignments
+            {t.connected.subtitle}
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export default function ConnectedPlayers({ players, onInspectPlayer, onViewAll }
           onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
-          <span>{showAll ? 'Collapse' : `View All (${players.length})`}</span>
+          <span>{showAll ? 'Collapse' : `${t.connected.viewAll} (${players.length})`}</span>
           <ChevronRight size={13} />
         </button>
       </div>
@@ -105,16 +107,23 @@ export default function ConnectedPlayers({ players, onInspectPlayer, onViewAll }
               letterSpacing: '0.06em',
               textTransform: 'uppercase'
             }}>
-              <th style={{ padding: '10px 18px', width: '50px' }}>ID</th>
-              <th style={{ padding: '10px 16px' }}>PLAYER</th>
-              <th style={{ padding: '10px 16px' }}>ROLE / JOB</th>
-              <th style={{ padding: '10px 16px', width: '70px' }}>PING</th>
-              <th style={{ padding: '10px 16px', width: '90px' }}>SESSION</th>
-              <th style={{ padding: '10px 18px', width: '80px', textAlign: 'right' }}>ACTIONS</th>
+              <th style={{ padding: '10px 18px', width: '50px' }}>{t.connected.thId}</th>
+              <th style={{ padding: '10px 16px' }}>{t.connected.thPlayer}</th>
+              <th style={{ padding: '10px 16px' }}>{t.connected.thJob}</th>
+              <th style={{ padding: '10px 16px', width: '70px' }}>{t.connected.thPing}</th>
+              <th style={{ padding: '10px 16px', width: '90px' }}>{t.connected.thSession}</th>
+              <th style={{ padding: '10px 18px', width: '80px', textAlign: 'right' }}>{t.connected.thAction}</th>
             </tr>
           </thead>
           <tbody>
-            {displayList.map((player, idx) => {
+            {displayList.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ padding: '36px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                  {t.playersTab.noPlayersFound}
+                </td>
+              </tr>
+            ) : (
+              displayList.map((player, idx) => {
               const roleStyle = getRoleStyle(player.jobType);
               return (
                 <tr
@@ -233,12 +242,12 @@ export default function ConnectedPlayers({ players, onInspectPlayer, onViewAll }
                         e.currentTarget.style.backgroundColor = 'var(--surface-subtle)';
                       }}
                     >
-                      Inspect
+                      {t.connected.inspect}
                     </button>
                   </td>
                 </tr>
               );
-            })}
+            }))}
           </tbody>
         </table>
       </div>

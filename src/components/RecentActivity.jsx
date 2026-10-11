@@ -10,8 +10,10 @@ import {
   ChevronRight,
   ShieldAlert
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function RecentActivity({ logs, onOpenLogs }) {
+  const { t } = useLanguage();
   const getLogIcon = (type) => {
     switch (type) {
       case 'ban':
@@ -65,10 +67,10 @@ export default function RecentActivity({ logs, onOpenLogs }) {
       }}>
         <div>
           <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', letterSpacing: '-0.01em' }}>
-            Recent Activity
+            {t.activity.title}
           </h2>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Real-time audit and administration log
+            {t.activity.subtitle}
           </p>
         </div>
 
@@ -86,13 +88,18 @@ export default function RecentActivity({ logs, onOpenLogs }) {
           onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
-          View All Logs <ChevronRight size={13} />
+          {t.activity.viewAllLogs} <ChevronRight size={13} />
         </button>
       </div>
 
       {/* strumien logow */}
       <div style={{ padding: '12px 18px', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {logs.map((log, idx) => {
+        {logs.length === 0 ? (
+          <div style={{ padding: '24px 10px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px' }}>
+            Brak zarejestrowanych zdarzeń (Oczekiwanie na pierwsze akcje serwera)
+          </div>
+        ) : (
+          logs.map((log, idx) => {
           const { icon: Icon, bg, color } = getLogIcon(log.type);
           return (
             <div
@@ -157,7 +164,7 @@ export default function RecentActivity({ logs, onOpenLogs }) {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* stopka */}

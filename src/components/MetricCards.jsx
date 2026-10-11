@@ -2,14 +2,16 @@
 
 import React from 'react';
 import { Copy, ChevronRight, Check } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
+  const { t } = useLanguage();
   const [copiedUptime, setCopiedUptime] = React.useState(false);
 
   const handleCopyUptime = () => {
     navigator.clipboard?.writeText?.(serverInfo.uptime);
     setCopiedUptime(true);
-    onToast?.(`Copied server uptime (${serverInfo.uptime})`);
+    onToast?.(`${t.metrics.copiedUptime} (${serverInfo.uptime})`);
     setTimeout(() => setCopiedUptime(false), 2000);
   };
 
@@ -25,7 +27,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-              Players Online
+              {t.metrics.playersOnline}
             </span>
             <span style={{
               fontSize: '11px',
@@ -36,7 +38,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
               color: 'var(--status-success)',
               border: '1px solid var(--status-success-border)'
             }}>
-              +8 last hr
+              {t.metrics.lastHour}
             </span>
           </div>
 
@@ -45,7 +47,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
               {serverInfo.onlinePlayers}
             </span>
             <span style={{ fontSize: '14px', color: 'var(--text-muted)' }} className="num-tabular">
-              / {serverInfo.maxPlayers} max
+              / {serverInfo.maxPlayers} {t.metrics.maxSlots}
             </span>
           </div>
         </div>
@@ -57,7 +59,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
           fontSize: '11px',
           color: 'var(--text-muted)'
         }}>
-          OneSync: <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>ON</span>
+          {t.metrics.onesyncStatus}
         </div>
       </div>
 
@@ -66,7 +68,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-              Server Status
+              {t.header.tabs.server.title}
             </span>
             <div style={{
               display: 'flex',
@@ -81,13 +83,13 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
               border: '1px solid var(--status-success-border)'
             }}>
               <span className="live-pulse-dot" style={{ width: '5px', height: '5px' }} />
-              <span>ACTIVE</span>
+              <span>{t.header.online}</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             <span style={{ fontSize: '28px', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>
-              ONLINE
+              {t.header.online}
             </span>
             <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }} className="num-tabular">
               {serverInfo.healthRate}
@@ -114,7 +116,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-              Server Uptime
+              {t.metrics.serverUptime}
             </span>
             <button
               onClick={handleCopyUptime}
@@ -126,7 +128,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
                 alignItems: 'center',
                 transition: 'color 0.15s ease'
               }}
-              title="Copy uptime"
+              title={t.metrics.copyUptime}
             >
               {copiedUptime ? <Check size={14} color="var(--status-success)" /> : <Copy size={13} />}
             </button>
@@ -149,7 +151,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
           alignItems: 'center',
           gap: '6px'
         }}>
-          <span>Started {serverInfo.uptimeStarted}</span>
+          <span>{t.metrics.sinceBoot} {serverInfo.uptimeStarted}</span>
           <span>·</span>
           <span style={{ color: 'var(--status-success)', fontWeight: 600 }} className="num-tabular">
             {serverInfo.fps} FPS
@@ -166,7 +168,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-              Total Resources
+              {t.metrics.activeResources}
             </span>
             <span style={{
               fontSize: '11px',
@@ -177,7 +179,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
               color: 'var(--status-warning)',
               border: '1px solid var(--status-warning-border)'
             }}>
-              {serverInfo.stoppedResources} Stopped
+              {serverInfo.stoppedResources} {t.metrics.stopped}
             </span>
           </div>
 
@@ -216,7 +218,7 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
             onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
           >
-            Manage <ChevronRight size={12} />
+            {t.metrics.manageScripts} <ChevronRight size={12} />
           </button>
         </div>
       </div>

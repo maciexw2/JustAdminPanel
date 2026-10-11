@@ -18,7 +18,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+import { useLanguage } from '@/lib/LanguageContext';
+
 export default function AdminsTab({ onToast }) {
+  const { t } = useLanguage();
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -92,7 +95,7 @@ export default function AdminsTab({ onToast }) {
       const data = await res.json();
 
       if (data.ok) {
-        onToast?.(`Administrator ${formUsername} utworzony pomyślnie`);
+        onToast?.(`${t.adminsTab.createdToast}: ${formUsername}`);
         setShowAddModal(false);
         setFormUsername('');
         setFormPassword('');
@@ -100,10 +103,10 @@ export default function AdminsTab({ onToast }) {
         setFormSteamHex('');
         loadAdmins();
       } else {
-        onToast?.(data.message || 'Błąd tworzenia administratora');
+        onToast?.(data.message || 'Error');
       }
     } catch {
-      onToast?.('Błąd połączenia z serwerem');
+      onToast?.(lang === 'pl' ? 'Błąd połączenia z serwerem' : 'Server connection error');
     }
   };
 
@@ -137,20 +140,20 @@ export default function AdminsTab({ onToast }) {
       const data = await res.json();
 
       if (data.ok) {
-        onToast?.(`Zaktualizowano dane administratora ${selectedAdmin.username}`);
+        onToast?.(`${t.adminsTab.updatedToast}: ${selectedAdmin.username}`);
         setShowEditModal(false);
         setSelectedAdmin(null);
         loadAdmins();
       } else {
-        onToast?.(data.message || 'Błąd aktualizacji');
+        onToast?.(data.message || 'Error');
       }
     } catch {
-      onToast?.('Błąd połączenia z serwerem');
+      onToast?.(lang === 'pl' ? 'Błąd połączenia z serwerem' : 'Server connection error');
     }
   };
 
   const handleDeleteAdmin = async (admin) => {
-    if (!confirm(`Czy na pewno chcesz usunąć administratora ${admin.username}?`)) return;
+    if (!confirm(`${t.adminsTab.deleteConfirm} ${admin.username}?`)) return;
 
     try {
       const res = await fetch(`/api/admins?id=${encodeURIComponent(admin.id)}`, {
@@ -159,13 +162,13 @@ export default function AdminsTab({ onToast }) {
       const data = await res.json();
 
       if (data.ok) {
-        onToast?.(`Administrator ${admin.username} został usunięty`);
+        onToast?.(`${t.adminsTab.deletedToast}: ${admin.username}`);
         loadAdmins();
       } else {
-        onToast?.(data.message || 'Błąd usuwania');
+        onToast?.(data.message || 'Error');
       }
     } catch {
-      onToast?.('Błąd połączenia z serwerem');
+      onToast?.(lang === 'pl' ? 'Błąd połączenia z serwerem' : 'Server connection error');
     }
   };
 
@@ -182,30 +185,30 @@ export default function AdminsTab({ onToast }) {
       {/* Statystyki personelu */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Zarejestrowani Administratorzy</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.adminsTab.statRegistered}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
-            {admins.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>w bazie JSON</span>
+            {admins.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>JSON</span>
           </div>
         </div>
 
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Super Administratorzy</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.adminsTab.statSuper}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--brand-purple)', marginTop: '4px' }} className="num-tabular">
             {admins.filter((a) => a.role === 'Super Admin').length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>Root</span>
           </div>
         </div>
 
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Aktywne 2FA</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.adminsTab.stat2fa}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-success)', marginTop: '4px' }} className="num-tabular">
             {admins.filter((a) => a.has2fa).length} / {admins.length}
           </div>
         </div>
 
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Przechowywanie Haseł</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.adminsTab.statStorage}</div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--status-success)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <ShieldCheck size={16} /> PBKDF2 + Sól (Sha512)
+            <ShieldCheck size={16} /> {t.adminsTab.storageDesc}
           </div>
         </div>
       </div>
@@ -219,7 +222,7 @@ export default function AdminsTab({ onToast }) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Szukaj administratora..."
+              placeholder={t.adminsTab.searchPlaceholder}
               style={{
                 width: '100%',
                 backgroundColor: 'var(--surface-subtle)',
@@ -240,7 +243,7 @@ export default function AdminsTab({ onToast }) {
             style={{ height: '32px', padding: '0 10px', fontSize: '12px' }}
           >
             <RefreshCw size={13} className={loading ? 'anim-spin' : ''} />
-            <span>Odśwież</span>
+            <span>{t.header.refreshTelemetry}</span>
           </button>
         </div>
 
@@ -250,7 +253,7 @@ export default function AdminsTab({ onToast }) {
           style={{ height: '34px', padding: '0 14px', fontSize: '12.5px' }}
         >
           <UserPlus size={14} />
-          <span>Dodaj Administratora</span>
+          <span>{t.adminsTab.addAdmin}</span>
         </button>
       </div>
 
@@ -267,13 +270,13 @@ export default function AdminsTab({ onToast }) {
               letterSpacing: '0.05em',
               textTransform: 'uppercase'
             }}>
-              <th style={{ padding: '12px 18px' }}>ADMINISTRATOR</th>
-              <th style={{ padding: '12px 16px' }}>ROLA</th>
-              <th style={{ padding: '12px 16px' }}>UPRAWNIENIA</th>
-              <th style={{ padding: '12px 16px' }}>DISCORD ID</th>
-              <th style={{ padding: '12px 16px' }}>2FA</th>
-              <th style={{ padding: '12px 16px' }}>OSTATNIA AKTYWNOŚĆ</th>
-              <th style={{ padding: '12px 18px', textAlign: 'right' }}>AKCJE</th>
+              <th style={{ padding: '12px 18px' }}>{t.adminsTab.thAdmin}</th>
+              <th style={{ padding: '12px 16px' }}>{t.adminsTab.thRole}</th>
+              <th style={{ padding: '12px 16px' }}>{t.adminsTab.thPermissions}</th>
+              <th style={{ padding: '12px 16px' }}>{t.adminsTab.thDiscord}</th>
+              <th style={{ padding: '12px 16px' }}>{t.adminsTab.th2fa}</th>
+              <th style={{ padding: '12px 16px' }}>{t.adminsTab.thLastActive}</th>
+              <th style={{ padding: '12px 18px', textAlign: 'right' }}>{t.adminsTab.thActions}</th>
             </tr>
           </thead>
           <tbody>
@@ -406,7 +409,7 @@ export default function AdminsTab({ onToast }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <UserPlus size={16} color="var(--brand-purple)" />
                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', margin: 0 }}>
-                  Dodaj Nowego Administratora
+                  {t.adminsTab.modalAddTitle}
                 </h3>
               </div>
               <button onClick={() => setShowAddModal(false)} style={{ color: 'var(--text-muted)' }}>
@@ -417,13 +420,13 @@ export default function AdminsTab({ onToast }) {
             <form onSubmit={handleCreateAdmin} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Nazwa administratora / Login
+                  {t.adminsTab.usernameLabel}
                 </label>
                 <input
                   type="text"
                   value={formUsername}
                   onChange={(e) => setFormUsername(e.target.value)}
-                  placeholder="np. Vega, QLin, Moderator1"
+                  placeholder={t.adminsTab.usernamePlaceholder}
                   required
                   style={{
                     width: '100%',
@@ -440,14 +443,14 @@ export default function AdminsTab({ onToast }) {
 
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Hasło (Zostanie bezpiecznie zahashowane algorytmem PBKDF2)
+                  {t.adminsTab.passwordLabel}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
-                    placeholder="Bezpieczne hasło..."
+                    placeholder={t.adminsTab.passwordPlaceholder}
                     required
                     style={{
                       width: '100%',
@@ -473,7 +476,7 @@ export default function AdminsTab({ onToast }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                    Rola w systemie
+                    {t.adminsTab.roleLabel}
                   </label>
                   <select
                     value={formRole}
@@ -498,13 +501,13 @@ export default function AdminsTab({ onToast }) {
 
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                    Discord Tag lub ID
+                    {t.adminsTab.discordLabel}
                   </label>
                   <input
                     type="text"
                     value={formDiscord}
                     onChange={(e) => setFormDiscord(e.target.value)}
-                    placeholder="np. 28491820491829104"
+                    placeholder={t.adminsTab.discordPlaceholder}
                     style={{
                       width: '100%',
                       backgroundColor: 'var(--surface-subtle)',
@@ -521,7 +524,7 @@ export default function AdminsTab({ onToast }) {
 
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Uprawnienia
+                  {t.adminsTab.permissionsLabel}
                 </label>
                 <input
                   type="text"
@@ -549,7 +552,7 @@ export default function AdminsTab({ onToast }) {
                   style={{ accentColor: 'var(--brand-purple)' }}
                 />
                 <label htmlFor="has2faCheckbox" style={{ fontSize: '12px', color: '#fff', cursor: 'pointer' }}>
-                  Wymagaj dwuskładnikowego uwierzytelniania (2FA)
+                  {t.adminsTab.enable2fa}
                 </label>
               </div>
 
@@ -560,14 +563,14 @@ export default function AdminsTab({ onToast }) {
                   className="btn-secondary"
                   style={{ height: '34px', padding: '0 14px' }}
                 >
-                  Anuluj
+                  {t.adminsTab.cancelBtn}
                 </button>
                 <button
                   type="submit"
                   className="btn-primary"
                   style={{ height: '34px', padding: '0 16px' }}
                 >
-                  Utwórz Administratora
+                  {t.adminsTab.createBtn}
                 </button>
               </div>
             </form>
@@ -593,7 +596,7 @@ export default function AdminsTab({ onToast }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Edit2 size={16} color="var(--brand-purple)" />
                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', margin: 0 }}>
-                  Edytuj: {selectedAdmin.username}
+                  {t.adminsTab.modalEditTitle}: {selectedAdmin.username}
                 </h3>
               </div>
               <button onClick={() => setShowEditModal(false)} style={{ color: 'var(--text-muted)' }}>
@@ -604,13 +607,13 @@ export default function AdminsTab({ onToast }) {
             <form onSubmit={handleUpdateAdmin} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Nowe hasło (pozostaw puste, aby nie zmieniać)
+                  {t.adminsTab.editPasswordLabel}
                 </label>
                 <input
                   type="password"
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
-                  placeholder="Wpisz nowe hasło..."
+                  placeholder={t.adminsTab.editPasswordPlaceholder}
                   style={{
                     width: '100%',
                     backgroundColor: 'var(--surface-subtle)',
@@ -627,7 +630,7 @@ export default function AdminsTab({ onToast }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                    Rola
+                    {t.adminsTab.roleLabel}
                   </label>
                   <select
                     value={editRole}
@@ -652,13 +655,13 @@ export default function AdminsTab({ onToast }) {
 
                 <div>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                    Discord ID
+                    {t.adminsTab.discordLabel}
                   </label>
                   <input
                     type="text"
                     value={editDiscord}
                     onChange={(e) => setEditDiscord(e.target.value)}
-                    placeholder="Discord ID..."
+                    placeholder={t.adminsTab.discordPlaceholder}
                     style={{
                       width: '100%',
                       backgroundColor: 'var(--surface-subtle)',
@@ -675,7 +678,7 @@ export default function AdminsTab({ onToast }) {
 
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Uprawnienia
+                  {t.adminsTab.permissionsLabel}
                 </label>
                 <input
                   type="text"
@@ -703,7 +706,7 @@ export default function AdminsTab({ onToast }) {
                   style={{ accentColor: 'var(--brand-purple)' }}
                 />
                 <label htmlFor="editHas2faCheckbox" style={{ fontSize: '12px', color: '#fff', cursor: 'pointer' }}>
-                  Wymagaj dwuskładnikowego uwierzytelniania (2FA)
+                  {t.adminsTab.enable2fa}
                 </label>
               </div>
 
@@ -714,14 +717,14 @@ export default function AdminsTab({ onToast }) {
                   className="btn-secondary"
                   style={{ height: '34px', padding: '0 14px' }}
                 >
-                  Anuluj
+                  {t.adminsTab.cancelBtn}
                 </button>
                 <button
                   type="submit"
                   className="btn-primary"
                   style={{ height: '34px', padding: '0 16px' }}
                 >
-                  Zapisz Zmiany
+                  {t.adminsTab.saveChangesBtn}
                 </button>
               </div>
             </form>

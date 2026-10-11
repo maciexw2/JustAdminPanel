@@ -13,8 +13,10 @@ import {
   Terminal,
   Zap
 } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ResourcesTab({ resources, onToggleResource, onRestartResource, onToast }) {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [ensureInput, setEnsureInput] = useState('');
@@ -47,27 +49,27 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
         gap: '12px'
       }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manifested Resources</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.resourcesTab.statManifested}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginTop: '4px' }} className="num-tabular">
-            {resources.length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>total</span>
+            {resources.length}
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active Runtime</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.resourcesTab.statRunning}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-success)', marginTop: '4px' }} className="num-tabular">
-            {resources.filter((r) => r.status === 'started').length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>running</span>
+            {resources.filter((r) => r.status === 'started').length}
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Dormant / Stopped</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.resourcesTab.statStopped}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-warning)', marginTop: '4px' }} className="num-tabular">
-            {resources.filter((r) => r.status === 'stopped').length} <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>inactive</span>
+            {resources.filter((r) => r.status === 'stopped').length}
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '14px 16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Lua Memory Pool</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.resourcesTab.statLuaPool}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: '#c4b5fd', marginTop: '4px' }} className="num-tabular">
-            148.6 MB <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>allocated</span>
+            148.6 MB
           </div>
         </div>
       </div>
@@ -90,7 +92,7 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search resources by name..."
+            placeholder={t.resourcesTab.searchPlaceholder}
             style={{
               background: 'none',
               border: 'none',
@@ -108,7 +110,7 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
             type="text"
             value={ensureInput}
             onChange={(e) => setEnsureInput(e.target.value)}
-            placeholder="ensure [resource_name]..."
+            placeholder="ensure [name]..."
             style={{
               backgroundColor: 'var(--surface-subtle)',
               border: '1px solid var(--border-primary)',
@@ -123,7 +125,7 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
           />
           <button type="submit" className="btn-secondary" style={{ height: '31px', fontSize: '11.5px' }}>
             <Zap size={13} color="var(--brand-purple)" />
-            <span>Ensure</span>
+            <span>{t.resourcesTab.ensureBtn}</span>
           </button>
         </form>
 
@@ -131,7 +133,7 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
         <div style={{ display: 'flex', gap: '8px' }}>
           <button onClick={handleRefreshAll} className="btn-secondary" style={{ height: '31px', fontSize: '12px' }}>
             <RotateCw size={13} />
-            <span>Reload Manifest</span>
+            <span>{t.resourcesTab.refreshAllBtn}</span>
           </button>
         </div>
       </div>
@@ -182,15 +184,22 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
               letterSpacing: '0.06em',
               textTransform: 'uppercase'
             }}>
-              <th style={{ padding: '12px 18px' }}>RESOURCE</th>
-              <th style={{ padding: '12px 16px' }}>AUTHOR / VERSION</th>
-              <th style={{ padding: '12px 16px' }}>TYPE</th>
-              <th style={{ padding: '12px 16px' }}>STATUS</th>
-              <th style={{ padding: '12px 18px', textAlign: 'right' }}>CONTROLS</th>
+              <th style={{ padding: '12px 18px' }}>{t.resourcesTab.thResource}</th>
+              <th style={{ padding: '12px 16px' }}>{t.resourcesTab.thAuthor}</th>
+              <th style={{ padding: '12px 16px' }}>{t.resourcesTab.thType}</th>
+              <th style={{ padding: '12px 16px' }}>{t.resourcesTab.thStatus}</th>
+              <th style={{ padding: '12px 18px', textAlign: 'right' }}>{t.resourcesTab.thControls}</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((res, idx) => {
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ padding: '36px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  Brak zasobów do wyświetlenia (Upewnij się, że skrypt just_admin ma uprawnienia i jest uruchomiony na serwerze)
+                </td>
+              </tr>
+            ) : (
+              filtered.map((res, idx) => {
               const isStarted = res.status === 'started';
               return (
                 <tr
@@ -256,10 +265,10 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
                         onClick={() => onRestartResource(res.name)}
                         className="btn-secondary"
                         style={{ height: '28px', padding: '0 8px', fontSize: '11.5px' }}
-                        title="Restart script"
+                        title={t.resourcesTab.btnRestart}
                       >
                         <RotateCw size={12} />
-                        <span>Restart</span>
+                        <span>{t.resourcesTab.btnRestart}</span>
                       </button>
                       <button
                         onClick={() => onToggleResource(res.name)}
@@ -274,13 +283,13 @@ export default function ResourcesTab({ resources, onToggleResource, onRestartRes
                           border: `1px solid ${isStarted ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)'}`
                         }}
                       >
-                        {isStarted ? 'Stop' : 'Start'}
+                        {isStarted ? t.resourcesTab.btnStop : t.resourcesTab.btnStart}
                       </button>
                     </div>
                   </td>
                 </tr>
               );
-            })}
+            }))}
           </tbody>
         </table>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 import {
   CheckCircle2,
   AlertTriangle,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function ChecklistTab({ onNavigateTab, onToast }) {
+  const { lang, t } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -39,7 +41,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
         setData(json);
       }
     } catch {
-      onToast?.('Błąd pobierania listy produkcyjnej');
+      onToast?.(lang === 'pl' ? 'Błąd pobierania listy produkcyjnej' : 'Error fetching production checklist');
     } finally {
       setLoading(false);
     }
@@ -61,11 +63,11 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
 
       if (resJson.ok) {
         setGeneratedSnippet(resJson.luaConfigSnippet);
-        onToast?.('Wygenerowano 64-bitowy token! Zaktualizuj config.lua');
+        onToast?.(lang === 'pl' ? 'Wygenerowano 64-bitowy token! Zaktualizuj config.lua' : '64-bit secure token generated! Update config.lua');
         await loadChecklist();
       }
     } catch {
-      onToast?.('Błąd generowania tokena');
+      onToast?.(lang === 'pl' ? 'Błąd generowania tokena' : 'Error generating token');
     } finally {
       setGeneratingToken(false);
     }
@@ -80,18 +82,18 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
       });
       const resJson = await res.json();
       if (resJson.ok) {
-        onToast?.('Zaktualizowano status weryfikacji ręcznej');
+        onToast?.(lang === 'pl' ? 'Zaktualizowano status weryfikacji ręcznej' : 'Manual verification status updated');
         await loadChecklist();
       }
     } catch {
-      onToast?.('Błąd aktualizacji statusu');
+      onToast?.(lang === 'pl' ? 'Błąd aktualizacji statusu' : 'Error updating check status');
     }
   };
 
   const copyToClipboard = (text) => {
     navigator.clipboard?.writeText?.(text);
     setCopiedSnippet(true);
-    onToast?.('Skopiowano do schowka!');
+    onToast?.(t.checklistTab.toastCopied);
     setTimeout(() => setCopiedSnippet(false), 2000);
   };
 
@@ -107,7 +109,6 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
   return (
     <div className="anim-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '0 28px 28px', maxWidth: '1080px' }}>
       
-      {/* Vercel-style Główny Baner Wdrożeniowy */}
       <div className="panel-card anim-slide-down" style={{
         padding: '24px 28px',
         background: 'linear-gradient(135deg, rgba(20, 20, 24, 0.95) 0%, rgba(124, 58, 237, 0.08) 100%)',
@@ -115,7 +116,6 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Delikatna poświata w tle */}
         <div style={{
           position: 'absolute',
           top: '-60px',
@@ -149,30 +149,29 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                 {data?.isProductionReady ? (
                   <>
                     <CheckCircle2 size={13} />
-                    <span>GOTOWY DO WDROŻENIA PRODUKCYJNEGO</span>
+                    <span>{t.checklistTab.readyBanner}</span>
                   </>
                 ) : (
                   <>
                     <ShieldAlert size={13} />
-                    <span>WYMAGANE DZIAŁANIA PRZED STARTEM ({data?.requiredPending || 0} BLOKADY)</span>
+                    <span>{t.checklistTab.blockerBanner} ({data?.requiredPending || 0} {t.checklistTab.blockersCount})</span>
                   </>
                 )}
               </div>
 
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Vercel-style Pre-flight Audit
+                {t.checklistTab.auditLabel}
               </span>
             </div>
 
             <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>
-              Lista kontrolna wdrożenia (Production Checklist)
+              {t.checklistTab.title}
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', maxWidth: '640px', lineHeight: '18px' }}>
-              Zanim udostępnisz serwer FiveM graczom na publicznym porcie, upewnij się, że domyślne hasła, tokeny mostka RPC oraz webhooki zostały zabezpieczone.
+              {t.checklistTab.subtitle}
             </p>
           </div>
 
-          {/* Licznik i odświeżanie */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <button
               type="button"
@@ -180,19 +179,18 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
               disabled={loading}
               className="btn-secondary"
               style={{ height: '34px', fontSize: '12px' }}
-              title="Przeładuj stan checklisty"
+              title={t.checklistTab.rescan}
             >
               <RefreshCw size={14} className={loading ? 'anim-spin' : ''} />
-              <span>Skanuj ponownie</span>
+              <span>{t.checklistTab.rescan}</span>
             </button>
           </div>
         </div>
 
-        {/* Pasek postępu Vercel */}
         <div style={{ marginTop: '22px', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', marginBottom: '8px' }}>
             <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
-              Stan gotowości systemu: <span style={{ color: '#fff', fontWeight: 600 }}>{data?.readyCount || 0} z {data?.totalCount || 8} punktów skonfigurowanych</span>
+              {t.checklistTab.readinessStatus} <span style={{ color: '#fff', fontWeight: 600 }}>{data?.readyCount || 0} {t.checklistTab.configuredOutOf} {data?.totalCount || 8} {t.checklistTab.configuredOutOfEnd}</span>
             </span>
             <span style={{
               fontWeight: 700,
@@ -220,7 +218,6 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
         </div>
       </div>
 
-      {/* Modal z wygenerowanym snippetem do config.lua */}
       {generatedSnippet && (
         <div className="panel-card anim-scale-pop" style={{
           padding: '18px 22px',
@@ -233,18 +230,18 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontWeight: 600, fontSize: '13px' }}>
               <Key size={16} color="var(--brand-purple)" />
-              <span>Nowy klucz zapisany w panelu! Zaktualizuj plik FiveM:</span>
+              <span>{t.checklistTab.keySavedNotice}</span>
             </div>
             <button
               onClick={() => setGeneratedSnippet(null)}
               style={{ color: 'var(--text-muted)', fontSize: '11px', cursor: 'pointer' }}
             >
-              Zamknij podgląd
+              {t.checklistTab.closePreview}
             </button>
           </div>
 
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-            Otwórz <code style={{ color: '#c4b5fd', fontFamily: 'var(--font-mono)' }}>fivem_resource/just_admin/config.lua</code> i wklej poniższą linijkę:
+            {t.checklistTab.openFileInstruction}
           </p>
 
           <div style={{
@@ -266,19 +263,18 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
               style={{ height: '28px', padding: '0 10px', fontSize: '11px' }}
             >
               {copiedSnippet ? <Check size={12} color="var(--status-success)" /> : <Copy size={12} />}
-              <span>{copiedSnippet ? 'Skopiowano' : 'Kopiuj'}</span>
+              <span>{copiedSnippet ? t.checklistTab.copied : t.checklistTab.copy}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Filtry Vercel-style */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {[
-          { id: 'all', label: `Wszystkie (${items.length})` },
-          { id: 'required', label: `Krytyczne blokady (${items.filter(i => i.severity === 'required' && i.status !== 'ready').length})` },
-          { id: 'recommended', label: `Zalecane (${items.filter(i => i.severity === 'recommended' && i.status !== 'ready').length})` },
-          { id: 'ready', label: `Ukończone (${items.filter(i => i.status === 'ready').length})` }
+          { id: 'all', label: `${t.checklistTab.filterAll} (${items.length})` },
+          { id: 'required', label: `${t.checklistTab.filterCritical} (${items.filter(i => i.severity === 'required' && i.status !== 'ready').length})` },
+          { id: 'recommended', label: `${t.checklistTab.filterRecommended} (${items.filter(i => i.severity === 'recommended' && i.status !== 'ready').length})` },
+          { id: 'ready', label: `${t.checklistTab.filterCompleted} (${items.filter(i => i.status === 'ready').length})` }
         ].map((tab) => {
           const active = filter === tab.id;
           return (
@@ -303,11 +299,14 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
         })}
       </div>
 
-      {/* Lista Zadań (Vercel Checklist Cards) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {filteredItems.map((item, idx) => {
           const isReady = item.status === 'ready';
           const isRequired = item.severity === 'required';
+          const itemTitle = lang === 'en' && item.titleEn ? item.titleEn : item.title;
+          const itemDesc = lang === 'en' && item.descriptionEn ? item.descriptionEn : item.description;
+          const itemVal = lang === 'en' && item.currentValueEn ? item.currentValueEn : item.currentValue;
+          const itemActionLabel = lang === 'en' && item.actionLabelEn ? item.actionLabelEn : item.actionLabel;
 
           return (
             <div
@@ -328,7 +327,6 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                 animationDelay: `${idx * 40}ms`
               }}
             >
-              {/* Lewa strona z opisem i statusem */}
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1, minWidth: '320px' }}>
                 <div style={{ marginTop: '2px', flexShrink: 0 }}>
                   {isReady ? (
@@ -349,7 +347,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                      {item.title}
+                      {itemTitle}
                     </span>
 
                     <span style={{
@@ -374,12 +372,12 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                         ? '1px solid rgba(239, 68, 68, 0.3)'
                         : '1px solid rgba(245, 158, 11, 0.3)'
                     }}>
-                      {isReady ? 'ZROBIONE' : isRequired ? 'WYMAGANA ZMIANA' : 'ZALECANE'}
+                      {isReady ? t.checklistTab.tagReady : isRequired ? t.checklistTab.tagRequired : t.checklistTab.tagRecommended}
                     </span>
                   </div>
 
                   <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', lineHeight: '16px' }}>
-                    {item.description}
+                    {itemDesc}
                   </p>
 
                   <div style={{
@@ -390,7 +388,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                     alignItems: 'center',
                     gap: '6px'
                   }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Wykryto:</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{t.checklistTab.detected}</span>
                     <code style={{
                       backgroundColor: 'var(--surface-subtle)',
                       padding: '2px 6px',
@@ -399,13 +397,12 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                       fontFamily: 'var(--font-mono)',
                       color: isReady ? '#4ade80' : '#fbbf24'
                     }}>
-                      {item.currentValue}
+                      {itemVal}
                     </code>
                   </div>
                 </div>
               </div>
 
-              {/* Prawa strona: Szybka Akcja */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                 {item.canAutoFix && (
                   <button
@@ -416,7 +413,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                     style={{ height: '32px', fontSize: '12px' }}
                   >
                     <Zap size={13} />
-                    <span>{generatingToken ? 'Generowanie...' : item.actionLabel}</span>
+                    <span>{generatingToken ? t.checklistTab.generating : itemActionLabel}</span>
                   </button>
                 )}
 
@@ -427,7 +424,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                     className="btn-secondary"
                     style={{ height: '32px', fontSize: '12px' }}
                   >
-                    <span>{item.actionLabel}</span>
+                    <span>{itemActionLabel}</span>
                     <ArrowRight size={13} />
                   </button>
                 )}
@@ -446,7 +443,7 @@ export default function ChecklistTab({ onNavigateTab, onToast }) {
                     }}
                   >
                     {isReady ? <Check size={13} /> : null}
-                    <span>{item.actionLabel}</span>
+                    <span>{itemActionLabel}</span>
                   </button>
                 )}
               </div>

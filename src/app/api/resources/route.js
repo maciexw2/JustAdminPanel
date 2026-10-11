@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { executeResourceAction } from '@/lib/fivemBridge';
-import { initialResources } from '@/data/mockServerData';
+import { executeResourceAction, getLiveResources } from '@/lib/fivemBridge';
 
 export async function GET() {
+  const live = await getLiveResources();
   return NextResponse.json({
     ok: true,
-    resources: initialResources
+    connected: live.isLive,
+    resources: live.resources || []
   });
 }
 

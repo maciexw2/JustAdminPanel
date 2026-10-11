@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { X, Boxes, Search, Play, Square, RotateCw } from 'lucide-react';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function ResourcesModal({ resources, isOpen, onClose, onToggleResource, onRestartResource }) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
 
   if (!isOpen) return null;
@@ -32,7 +34,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Boxes size={18} color="var(--brand-purple)" />
             <span style={{ fontSize: '15px', fontWeight: 600, color: '#fff' }}>
-              FXServer Resource Manifest
+              {t.modals.resources.title}
             </span>
             <span style={{
               fontSize: '11px',
@@ -41,7 +43,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
               backgroundColor: 'var(--border-primary)',
               color: 'var(--text-secondary)'
             }}>
-              {resources.length} resources
+              {resources.length}
             </span>
           </div>
 
@@ -68,7 +70,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter resources (ox_inventory, just-core, es_extended)..."
+              placeholder={t.modals.resources.searchPlaceholder}
               style={{
                 background: 'none',
                 border: 'none',
@@ -86,10 +88,10 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
             <thead>
               <tr style={{ color: 'var(--text-muted)', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <th style={{ padding: '10px 0' }}>RESOURCE</th>
-                <th style={{ padding: '10px 0' }}>CATEGORY</th>
-                <th style={{ padding: '10px 0' }}>STATUS</th>
-                <th style={{ padding: '10px 0', textAlign: 'right' }}>ACTIONS</th>
+                <th style={{ padding: '10px 0' }}>{t.resourcesTab.thResource}</th>
+                <th style={{ padding: '10px 0' }}>{t.resourcesTab.thType}</th>
+                <th style={{ padding: '10px 0' }}>{t.resourcesTab.thStatus}</th>
+                <th style={{ padding: '10px 0', textAlign: 'right' }}>{t.resourcesTab.thControls}</th>
               </tr>
             </thead>
             <tbody>
@@ -137,7 +139,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
                           borderRadius: '50%',
                           backgroundColor: isStarted ? 'var(--status-success)' : 'var(--status-warning)'
                         }} />
-                        {isStarted ? 'STARTED' : 'STOPPED'}
+                        {isStarted ? (t.resourcesTab.running).toUpperCase() : (t.resourcesTab.stopped).toUpperCase()}
                       </span>
                     </td>
 
@@ -152,7 +154,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
                             color: 'var(--text-secondary)',
                             border: '1px solid var(--border-subtle)'
                           }}
-                          title="Restart Resource"
+                          title={t.modals.resources.restart}
                         >
                           <RotateCw size={12} />
                         </button>
@@ -168,7 +170,7 @@ export default function ResourcesModal({ resources, isOpen, onClose, onToggleRes
                             fontWeight: 500
                           }}
                         >
-                          {isStarted ? 'Stop' : 'Start'}
+                          {isStarted ? t.modals.resources.stop : t.modals.resources.start}
                         </button>
                       </div>
                     </td>

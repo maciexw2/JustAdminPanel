@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/lib/LanguageContext';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import MetricCards from '@/components/MetricCards';
@@ -24,26 +25,50 @@ import LogsTab from '@/components/tabs/LogsTab';
 import SettingsTab from '@/components/tabs/SettingsTab';
 import AdminsTab from '@/components/tabs/AdminsTab';
 import ChecklistTab from '@/components/tabs/ChecklistTab';
+import { AlertTriangle, ArrowRight, RefreshCw, X } from 'lucide-react';
 
-import {
-  initialServerInfo,
-  initialHardware,
-  activityData24h,
-  initialPlayers,
-  initialAuditLogs,
-  initialResources
-} from '@/data/mockServerData';
+const emptyServerInfo = {
+  name: 'FiveM FXServer',
+  version: 'FXServer (Offline)',
+  endpoint: '127.0.0.1:30120',
+  txAdminVersion: 'v7.2.1',
+  oneSync: 'OneSync BigMode',
+  onlinePlayers: 0,
+  maxPlayers: 0,
+  registeredSlots: 0,
+  uptime: 'Offline',
+  uptimeStarted: '-',
+  fps: 0,
+  tickTimeMs: 0,
+  status: 'OFFLINE',
+  healthRate: '0%',
+  totalResources: 0,
+  activeResources: 0,
+  stoppedResources: 0
+};
+
+const emptyHardware = {
+  cpuUsage: 0,
+  cpuModel: 'Oczekiwanie na połączenie ze skryptem',
+  cpuClock: '-',
+  ramUsedGb: 0,
+  ramTotalGb: 0,
+  ramPercent: 0,
+  outboundMbps: 0,
+  inboundMbps: 0
+};
 
 export default function DashboardPage() {
+  const { lang, t } = useLanguage();
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
-  const [serverInfo, setServerInfo] = useState(initialServerInfo);
-  const [hardware, setHardware] = useState(initialHardware);
+  const [serverInfo, setServerInfo] = useState(emptyServerInfo);
+  const [hardware, setHardware] = useState(emptyHardware);
   const [players, setPlayers] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [resources, setResources] = useState(initialResources);
+  const [resources, setResources] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const [inspectPlayer, setInspectPlayer] = useState(null);
@@ -86,7 +111,7 @@ export default function DashboardPage() {
     } catch {}
     setUser(null);
     setIsAuthenticated(false);
-    addToast('Wylogowano z panelu');
+    addToast(lang === 'pl' ? 'Wylogowano z panelu' : 'Logged out from panel');
   };
 
   const stoppedCount = resources.filter((r) => r.status === 'stopped').length;
@@ -103,51 +128,46 @@ export default function DashboardPage() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  useEffect(() => {
-    async function loadInitialData() {
-      try {
-        const [statusRes, playersRes, bansRes] = await Promise.all([
-          fetch('/api/status').then((r) => r.json()),
-          fetch('/api/players').then((r) => r.json()),
-          fetch('/api/bans').then((r) => r.json())
-        ]);
+  const loadData = async () => {
+    try {
+      const [statusRes, playersRes, resourcesRes] = await Promise.all([
+        fetch('/api/status').then((r) => r.json()).catch(() => null),
+        fetch('/api/players').then((r) => r.json()).catch(() => null),
+        fetch('/api/resources').then((r) => r.json()).catch(() => null)
+      ]);
 
-        if (statusRes.server) setServerInfo(statusRes.server);
-        if (statusRes.hardware) setHardware(statusRes.hardware);
-        if (Array.isArray(playersRes.players)) setPlayers(playersRes.players);
-      } catch (e) {
+      if (statusRes?.server) {
+        setServerInfo(statusRes.server);
       }
-    }
+      if (statusRes?.hardware) {
+        setHardware(statusRes.hardware);
+      }
+      if (Array.isArray(playersRes?.players)) {
+        setPlayers(playersRes.players);
+      } else {
+        setPlayers([]);
+      }
+      if (Array.isArray(resourcesRes?.resources)) {
+        setResources(resourcesRes.resources);
+      } else {
+        setResources([]);
+      }
+    } catch (e) {}
+  };
 
-    loadInitialData();
+  useEffect(() => {
+    loadData();
   }, []);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    addToast('Synchronizing txAdmin telemetry and OneSync state...');
+    addToast(lang === 'pl' ? 'Synchronizowanie telemetrii txAdmin i stanu OneSync...' : 'Synchronizing txAdmin telemetry and OneSync state...');
 
     try {
-      const [statusRes, playersRes] = await Promise.all([
-        fetch('/api/status').then((r) => r.json()),
-        fetch('/api/players').then((r) => r.json())
-      ]);
-
-      if (statusRes.server) {
-        setServerInfo(statusRes.server);
-      } else {
-        setServerInfo((prev) => ({
-          ...prev,
-          fps: +(59.5 + Math.random() * 1.5).toFixed(1),
-          tickTimeMs: +(16.2 + Math.random() * 0.8).toFixed(1)
-        }));
-      }
-
-      if (statusRes.hardware) setHardware(statusRes.hardware);
-      if (playersRes.players && playersRes.players.length > 0) setPlayers(playersRes.players);
-
-      addToast('Telemetry refreshed successfully');
+      await loadData();
+      addToast(lang === 'pl' ? 'Pomyślnie odświeżono telemetrię' : 'Telemetry refreshed successfully');
     } catch (err) {
-      addToast('Telemetry refreshed (fallback mode)');
+      addToast(lang === 'pl' ? 'Odświeżono telemetrię (tryb fallback)' : 'Telemetry refreshed (fallback mode)');
     } finally {
       setIsRefreshing(false);
     }
@@ -166,13 +186,13 @@ export default function DashboardPage() {
     const newLog = {
       id: `log-${Date.now()}`,
       type: 'kick',
-      admin: 'Maciex',
-      actionText: `QLin kicked Player #${playerId}`,
-      timeAgo: 'Just now',
-      detail: `Reason: ${reason || 'Staff intervention'}`
+      admin: user?.username || 'Admin',
+      actionText: `${user?.username || 'Admin'} ${lang === 'pl' ? 'wyrzucił Gracza' : 'kicked Player'} #${playerId}`,
+      timeAgo: lang === 'pl' ? 'Przed chwilą' : 'Just now',
+      detail: `${lang === 'pl' ? 'Powód' : 'Reason'}: ${reason || (lang === 'pl' ? 'Interwencja personelu' : 'Staff intervention')}`
     };
     setLogs((prev) => [newLog, ...prev.slice(0, 5)]);
-    addToast(`Player #${playerId} (${target.name}) was kicked`);
+    addToast(lang === 'pl' ? `Gracz #${playerId} (${target.name}) został wyrzucony` : `Player #${playerId} (${target.name}) was kicked`);
 
     try {
       await fetch('/api/players', {
@@ -197,13 +217,13 @@ export default function DashboardPage() {
     const newLog = {
       id: `log-${Date.now()}`,
       type: 'ban',
-      admin: 'Maciex',
-      actionText: `Maciex banned Player #${playerId}`,
-      timeAgo: 'Just now',
-      detail: `Reason: ${reason || 'Permanent txAdmin ban'}`
+      admin: user?.username || 'Admin',
+      actionText: `${user?.username || 'Admin'} ${lang === 'pl' ? 'zbanował Gracza' : 'banned Player'} #${playerId}`,
+      timeAgo: lang === 'pl' ? 'Przed chwilą' : 'Just now',
+      detail: `${lang === 'pl' ? 'Powód' : 'Reason'}: ${reason || (lang === 'pl' ? 'Permanentny ban' : 'Permanent ban')}`
     };
     setLogs((prev) => [newLog, ...prev.slice(0, 5)]);
-    addToast(`Permanent ban issued for Player #${playerId} (${target.name})`);
+    addToast(lang === 'pl' ? `Nałożono permanentny ban na Gracza #${playerId} (${target.name})` : `Permanent ban issued for Player #${playerId} (${target.name})`);
 
     try {
       await fetch('/api/players', {
@@ -238,7 +258,11 @@ export default function DashboardPage() {
       stoppedResources: willStop ? prev.stoppedResources + 1 : prev.stoppedResources - 1
     }));
 
-    addToast(`Resource "${resName}" ${willStop ? 'stopped' : 'started'}`);
+    addToast(
+      lang === 'pl'
+        ? `Zasób "${resName}" został ${willStop ? 'zatrzymany' : 'uruchomiony'}`
+        : `Resource "${resName}" ${willStop ? 'stopped' : 'started'}`
+    );
 
     try {
       await fetch('/api/resources', {
@@ -251,14 +275,14 @@ export default function DashboardPage() {
   };
 
   const handleRestartResource = async (resName) => {
-    addToast(`Restarting resource "${resName}"...`);
+    addToast(lang === 'pl' ? `Restartowanie zasobu "${resName}"...` : `Restarting resource "${resName}"...`);
     const newLog = {
       id: `log-${Date.now()}`,
       type: 'restart',
-      admin: 'Maciex',
-      actionText: `Maciex restarted ${resName}`,
-      timeAgo: 'Just now',
-      detail: 'Rebuilt cache and re-registered client exports'
+      admin: user?.username || 'Admin',
+      actionText: `${user?.username || 'Admin'} ${lang === 'pl' ? 'zrestartował' : 'restarted'} ${resName}`,
+      timeAgo: lang === 'pl' ? 'Przed chwilą' : 'Just now',
+      detail: lang === 'pl' ? 'Przebudowano pamięć podręczną i zarejestrowano eksporty' : 'Rebuilt cache and re-registered client exports'
     };
     setLogs((prev) => [newLog, ...prev.slice(0, 5)]);
 
@@ -279,7 +303,7 @@ export default function DashboardPage() {
           onLogin={(loggedInUser) => {
             setUser(loggedInUser);
             setIsAuthenticated(true);
-            addToast(`Zalogowano jako ${loggedInUser.username}`);
+            addToast(lang === 'pl' ? `Zalogowano jako ${loggedInUser.username}` : `Logged in as ${loggedInUser.username}`);
           }}
         />
         <ToastContainer toasts={toasts} onDismiss={removeToast} />
@@ -325,7 +349,13 @@ export default function DashboardPage() {
 
               <div style={{ display: 'flex', gap: '14px', padding: '0 28px', flexWrap: 'wrap' }}>
                 <PlayerActivityChart
-                  data={activityData24h}
+                  data={serverInfo.status === 'ONLINE' ? [
+                    { time: '00:00', players: Math.max(0, serverInfo.onlinePlayers - 4) },
+                    { time: '06:00', players: Math.max(0, serverInfo.onlinePlayers - 2) },
+                    { time: '12:00', players: serverInfo.onlinePlayers },
+                    { time: '18:00', players: serverInfo.onlinePlayers },
+                    { time: 'Now', players: serverInfo.onlinePlayers, isCurrent: true }
+                  ] : []}
                   nowCount={serverInfo.onlinePlayers}
                 />
                 <ServerHealth hardware={hardware} />
@@ -439,6 +469,129 @@ export default function DashboardPage() {
       />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
+
+      {/* Przyklejony do dołu ekranu baner ostrzegawczy z paddingiem (Sticky Bottom) */}
+      {serverInfo.status !== 'ONLINE' && (
+        <div
+          className="anim-slide-up"
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '280px',
+            right: '24px',
+            zIndex: 900,
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            style={{
+              pointerEvents: 'auto',
+              backgroundColor: 'rgba(24, 14, 18, 0.94)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(239, 68, 68, 0.45)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(239, 68, 68, 0.2)',
+              borderRadius: '12px',
+              padding: '14px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '300px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.18)',
+                  border: '1px solid rgba(239, 68, 68, 0.45)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+              >
+                <AlertTriangle size={18} color="#ef4444" />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#fca5a5' }}>
+                    {t.header.disconnectedBanner.title}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(239, 68, 68, 0.25)',
+                      color: '#fecaca',
+                      letterSpacing: '0.04em'
+                    }}
+                  >
+                    HTTP 401 / OFFLINE
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: 'rgba(254, 202, 202, 0.82)', marginTop: '2px', lineHeight: '16px' }}>
+                  {t.header.disconnectedBanner.desc}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab('checklist')}
+                className="btn-secondary"
+                style={{
+                  height: '34px',
+                  fontSize: '12px',
+                  padding: '0 14px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  borderColor: 'rgba(239, 68, 68, 0.5)',
+                  color: '#fff'
+                }}
+              >
+                <span>{t.header.disconnectedBanner.actionChecklist}</span>
+                <ArrowRight size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('settings')}
+                className="btn-primary"
+                style={{
+                  height: '34px',
+                  fontSize: '12px',
+                  padding: '0 14px',
+                  backgroundColor: '#ef4444',
+                  borderColor: '#ef4444'
+                }}
+              >
+                <span>{t.header.disconnectedBanner.actionSettings}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="btn-secondary"
+                style={{
+                  height: '34px',
+                  fontSize: '12px',
+                  padding: '0 10px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  borderColor: 'rgba(239, 68, 68, 0.5)',
+                  color: '#fff'
+                }}
+                title={t.header.disconnectedBanner.retry}
+              >
+                <RefreshCw size={13} className={isRefreshing ? 'anim-spin' : ''} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

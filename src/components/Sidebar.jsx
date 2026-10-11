@@ -16,35 +16,39 @@ import {
   ListChecks
 } from 'lucide-react';
 
+import { useLanguage } from '@/lib/LanguageContext';
+
 export default function Sidebar({ activeTab, setActiveTab, playerCount = 42, stoppedCount = 2 }) {
+  const { t } = useLanguage();
+
   const navSections = [
     {
-      title: 'OVERVIEW',
+      title: t.nav.overview,
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }
+        { id: 'dashboard', label: t.nav.dashboard, icon: LayoutDashboard }
       ]
     },
     {
-      title: 'MANAGEMENT',
+      title: t.nav.management,
       items: [
-        { id: 'players', label: 'Players', icon: Users, badge: String(playerCount) },
-        { id: 'moderation', label: 'Moderation', icon: ShieldAlert },
-        { id: 'resources', label: 'Resources', icon: Boxes, badge: String(stoppedCount), badgeVariant: 'warning' }
+        { id: 'players', label: t.nav.players, icon: Users, badge: String(playerCount) },
+        { id: 'moderation', label: t.nav.moderation, icon: ShieldAlert },
+        { id: 'resources', label: t.nav.resources, icon: Boxes, badge: String(stoppedCount), badgeVariant: 'warning' }
       ]
     },
     {
-      title: 'MONITORING',
+      title: t.nav.monitoring,
       items: [
-        { id: 'server', label: 'Server', icon: Activity },
-        { id: 'logs', label: 'Console & Logs', icon: Terminal }
+        { id: 'server', label: t.nav.server, icon: Activity },
+        { id: 'logs', label: t.nav.logs, icon: Terminal }
       ]
     },
     {
-      title: 'SYSTEM',
+      title: t.nav.system,
       items: [
-        { id: 'checklist', label: 'Production Checklist', icon: ListChecks, badge: 'PROD', badgeVariant: 'warning' },
-        { id: 'settings', label: 'Settings', icon: Settings },
-        { id: 'admins', label: 'Admins', icon: ShieldCheck }
+        { id: 'checklist', label: t.nav.checklist, icon: ListChecks, badge: 'PROD', badgeVariant: 'warning' },
+        { id: 'settings', label: t.nav.settings, icon: Settings },
+        { id: 'admins', label: t.nav.admins, icon: ShieldCheck }
       ]
     }
   ];
@@ -99,7 +103,7 @@ export default function Sidebar({ activeTab, setActiveTab, playerCount = 42, sto
             </span>
           </div>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '14px' }}>
-            FiveM txAdmin node
+            {t.nav.connectedNode}
           </p>
         </div>
       </div>

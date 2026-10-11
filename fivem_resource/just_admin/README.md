@@ -1,6 +1,4 @@
-# Just AdminPanel - Skrypt Serwerowy FiveM
-
-Skrypt mostu (bridge) dla FiveM FXServer umozliwiajacy polaczenie z panelem administracyjnym Just AdminPanel.
+## bridge
 
 ## Instalacja na serwerze FiveM
 

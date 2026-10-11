@@ -1,4 +1,5 @@
 import './globals.css';
+import { LanguageProvider } from '@/lib/LanguageContext';
 
 export const metadata = {
   title: 'Just AdminPanel // FiveM Control Plane',
@@ -11,7 +12,11 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/logojust.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

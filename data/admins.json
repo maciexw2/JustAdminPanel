@@ -1,0 +1,17 @@
+[
+  {
+    "id": "adm_1",
+    "username": "admin",
+    "role": "Super Admin",
+    "roleColor": "#7c3aed",
+    "passwordHash": "55e3462262bbec65a40b1afdcfbc075a:1b2fc574d70a9fed8c0ba36b6f67f4c7e4b650d81c765ae1cb975f936d21b8b574b93b5a93e62e7c25e0d4927af5c5855e16d9c62b2db3efae94cd95aad9a9b3",
+    "discord": "admin#0001",
+    "discordId": "28491820491829104",
+    "steamHex": "steam:11000010c2a8f9b",
+    "avatarBg": "#7c3aed",
+    "has2fa": true,
+    "createdAt": "2026-10-10T13:10:11.744Z",
+    "lastActive": "Online Now",
+    "permissions": "Full Root Access (txAdmin Master)"
+  }
+]

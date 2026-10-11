@@ -1,0 +1,26 @@
+{
+  "fivemEndpoint": "http://127.0.0.1:30120/just_admin",
+  "apiKey": "just_sec_d65571148decdabdc40ccf5bbbb52c3a5cc57ed5f30d11e0",
+  "serverName": "Los Santos Roleplay // Polish Official",
+  "serverEndpoint": "142.250.190.40:30120",
+  "maxPlayers": 128,
+  "oneSync": "OneSync BigMode",
+  "tags": "roleplay, polish, custom, esx, realistic, txadmin",
+  "gameBuild": "3095",
+  "rconPassword": "super_secret_rcon_pass",
+  "steamApiKey": "1A2B3C4D5E6F708192A1B2C3D4E5F678",
+  "discordWebhook": "https://discord.com/api/webhooks/12984192847192/just_admin_logs",
+  "crashAlertWebhook": "https://discord.com/api/webhooks/12984192847192/just_crashes",
+  "pollingInterval": 3000,
+  "autoReconnect": true,
+  "syncTxAdmin": true,
+  "blockVpn": false,
+  "soundAlerts": true,
+  "theme": {
+    "brandColor": "#7c3aed",
+    "surfaceBase": "#09090b",
+    "surfacePanel": "#141418",
+    "borderRadius": "8px",
+    "enableGlow": true
+  }
+}

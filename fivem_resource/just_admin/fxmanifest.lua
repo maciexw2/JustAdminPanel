@@ -8,5 +8,6 @@ version '1.0.0'
 
 server_scripts {
     'config.lua',
+    'bridge.lua',
     'server.lua'
 }

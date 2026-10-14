@@ -17,7 +17,15 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
-export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onBanPlayer, onToast }) {
+export default function PlayersTab({
+  players,
+  onInspectPlayer,
+  onKickPlayer,
+  onBanPlayer,
+  onRevivePlayer,
+  onTeleportPlayer,
+  onToast
+}) {
   const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('all');
@@ -325,7 +333,11 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
                       </button>
                       <button
                         onClick={() => {
-                          onToast?.(`Teleported admin to ${player.name}`);
+                          if (onTeleportPlayer) {
+                            onTeleportPlayer(player.id, player.coords);
+                          } else {
+                            onToast?.(`Teleported admin to ${player.name}`);
+                          }
                         }}
                         style={{
                           height: '28px',
@@ -341,7 +353,11 @@ export default function PlayersTab({ players, onInspectPlayer, onKickPlayer, onB
                       </button>
                       <button
                         onClick={() => {
-                          onToast?.(`Healed & revived ${player.name}`);
+                          if (onRevivePlayer) {
+                            onRevivePlayer(player.id);
+                          } else {
+                            onToast?.(`Healed & revived ${player.name}`);
+                          }
                         }}
                         style={{
                           height: '28px',

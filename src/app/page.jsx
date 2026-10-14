@@ -25,6 +25,7 @@ import LogsTab from '@/components/tabs/LogsTab';
 import SettingsTab from '@/components/tabs/SettingsTab';
 import AdminsTab from '@/components/tabs/AdminsTab';
 import ChecklistTab from '@/components/tabs/ChecklistTab';
+import SupportTab from '@/components/tabs/SupportTab';
 import { AlertTriangle, ArrowRight, RefreshCw, X } from 'lucide-react';
 
 const emptyServerInfo = {
@@ -240,6 +241,50 @@ export default function DashboardPage() {
     }
   };
 
+  const handleRevivePlayer = async (playerId) => {
+    const target = players.find((p) => p.id === playerId);
+    const targetName = target ? target.name : `#${playerId}`;
+
+    setPlayers((prev) =>
+      prev.map((p) => (p.id === playerId ? { ...p, health: 100, armor: 100 } : p))
+    );
+
+    addToast(lang === 'pl' ? `Uleczono i ożywiono Gracza ${targetName}` : `Healed & revived Player ${targetName}`);
+
+    const newLog = {
+      id: `log-${Date.now()}`,
+      type: 'revive',
+      admin: user?.username || 'Admin',
+      actionText: `${user?.username || 'Admin'} ${lang === 'pl' ? 'ożywił Gracza' : 'revived Player'} #${playerId}`,
+      timeAgo: lang === 'pl' ? 'Przed chwilą' : 'Just now',
+      detail: lang === 'pl' ? 'Przywrócono 100% życia i kamizelki' : 'Restored 100% HP & Armor'
+    };
+    setLogs((prev) => [newLog, ...prev.slice(0, 5)]);
+
+    try {
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'revive', playerId })
+      });
+    } catch (e) {}
+  };
+
+  const handleTeleportPlayer = async (playerId, coords) => {
+    const target = players.find((p) => p.id === playerId);
+    const targetName = target ? target.name : `#${playerId}`;
+
+    addToast(lang === 'pl' ? `Teleportowano do Gracza ${targetName}` : `Teleported to Player ${targetName}`);
+
+    try {
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'teleport', playerId, coords })
+      });
+    } catch (e) {}
+  };
+
   const handleToggleResource = async (resName) => {
     const target = resources.find((r) => r.name === resName);
     const willStop = target?.status === 'started';
@@ -350,13 +395,19 @@ export default function DashboardPage() {
               <div style={{ display: 'flex', gap: '14px', padding: '0 28px', flexWrap: 'wrap' }}>
                 <PlayerActivityChart
                   data={serverInfo.status === 'ONLINE' ? [
-                    { time: '00:00', players: Math.max(0, serverInfo.onlinePlayers - 4) },
-                    { time: '06:00', players: Math.max(0, serverInfo.onlinePlayers - 2) },
-                    { time: '12:00', players: serverInfo.onlinePlayers },
-                    { time: '18:00', players: serverInfo.onlinePlayers },
-                    { time: 'Now', players: serverInfo.onlinePlayers, isCurrent: true }
-                  ] : []}
-                  nowCount={serverInfo.onlinePlayers}
+                    { time: '00:00', players: Math.max(0, Math.floor(serverInfo.onlinePlayers * 0.4)) },
+                    { time: '06:00', players: Math.max(0, Math.floor(serverInfo.onlinePlayers * 0.2)) },
+                    { time: '12:00', players: Math.max(0, Math.floor(serverInfo.onlinePlayers * 0.7)) },
+                    { time: '18:00', players: Math.max(0, Math.floor(serverInfo.onlinePlayers * 0.9)) },
+                    { time: 'Teraz', players: serverInfo.onlinePlayers, isCurrent: true }
+                  ] : [
+                    { time: '00:00', players: 0 },
+                    { time: '06:00', players: 0 },
+                    { time: '12:00', players: 0 },
+                    { time: '18:00', players: 0 },
+                    { time: 'Teraz', players: 0, isCurrent: true }
+                  ]}
+                  nowCount={serverInfo.onlinePlayers || 0}
                 />
                 <ServerHealth hardware={hardware} />
               </div>
@@ -387,6 +438,8 @@ export default function DashboardPage() {
               onInspectPlayer={(p) => setInspectPlayer(p)}
               onKickPlayer={handleKickPlayer}
               onBanPlayer={handleBanPlayer}
+              onRevivePlayer={handleRevivePlayer}
+              onTeleportPlayer={handleTeleportPlayer}
               onToast={addToast}
             />
           )}
@@ -434,6 +487,10 @@ export default function DashboardPage() {
               onToast={addToast}
             />
           )}
+
+          {activeTab === 'support' && (
+            <SupportTab onToast={addToast} />
+          )}
         </div>
       </main>
 
@@ -450,6 +507,8 @@ export default function DashboardPage() {
         onClose={() => setInspectPlayer(null)}
         onKick={handleKickPlayer}
         onBan={handleBanPlayer}
+        onRevive={handleRevivePlayer}
+        onTeleport={handleTeleportPlayer}
         onToast={addToast}
       />
 
@@ -469,8 +528,7 @@ export default function DashboardPage() {
       />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
-
-      {/* Przyklejony do dołu ekranu baner ostrzegawczy z paddingiem (Sticky Bottom) */}
+ 
       {serverInfo.status !== 'ONLINE' && (
         <div
           className="anim-slide-up"

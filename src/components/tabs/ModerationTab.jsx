@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ShieldAlert,
   Gavel,
@@ -10,101 +8,48 @@ import {
   Plus,
   Clock,
   CheckCircle2,
-  X
+  X,
+  Upload,
+  RefreshCw
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
-const initialBans = [
-  {
-    id: 'BAN-9821',
-    player: 'Player #124 (NexusCheater)',
-    steamHex: 'steam:11000018f2a912b',
-    reason: 'Cheating / Lua Executor (Permanent)',
-    admin: 'Maciex (Super Admin)',
-    issuedAt: '10m ago',
-    duration: 'PERMANENT',
-    isPermanent: true
-  },
-  {
-    id: 'BAN-9818',
-    player: 'SpeedyDemon_PL',
-    steamHex: 'steam:11000014a99182c',
-    reason: 'Severe VDM in Greenzone (Legion Square)',
-    admin: 'Vega (Admin)',
-    issuedAt: '2h ago',
-    duration: '3 days remaining',
-    isPermanent: false
-  },
-  {
-    id: 'BAN-9799',
-    player: 'TrollMan99',
-    steamHex: 'steam:11000012b48192a',
-    reason: 'Combat Logging during active police pursuit',
-    admin: 'QLin (Admin)',
-    issuedAt: '1d ago',
-    duration: '6 days remaining',
-    isPermanent: false
-  },
-  {
-    id: 'BAN-9762',
-    player: 'ShadowExploiter',
-    steamHex: 'steam:11000010c928471',
-    reason: 'Duplication glitch abuse with ox_inventory trunk',
-    admin: 'Maciex (Super Admin)',
-    issuedAt: '3d ago',
-    duration: 'PERMANENT',
-    isPermanent: true
-  }
-];
-
-const initialWarnings = [
-  {
-    id: 'WARN-102',
-    player: 'John_Doe (#102)',
-    reason: 'OOC chat usage during hostage negotiation',
-    admin: 'Vega',
-    issuedAt: '45m ago',
-    activeCount: 1
-  },
-  {
-    id: 'WARN-101',
-    player: 'Kacper_K (#114)',
-    reason: 'Reckless driving inside Hospital emergency bay',
-    admin: 'QLin',
-    issuedAt: '3h ago',
-    activeCount: 2
-  }
-];
-
 export default function ModerationTab({ onToast }) {
   const { t } = useLanguage();
-  const [bans, setBans] = useState(initialBans);
-  const [warnings, setWarnings] = useState(initialWarnings);
+  const [bans, setBans] = useState([]);
+  const [warnings, setWarnings] = useState([]);
   const [search, setSearch] = useState('');
   const [activeSubTab, setActiveSubTab] = useState('bans');
   const [showNewBanModal, setShowNewBanModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // stan formularza nowego bana
   const [newBanTarget, setNewBanTarget] = useState('');
   const [newBanReason, setNewBanReason] = useState('');
   const [newBanDuration, setNewBanDuration] = useState('Permanent');
 
+  const fetchBans = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/bans');
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.bans)) {
+        setBans(data.bans);
+      }
+    } catch {}
+    setIsLoading(false);
+  };
+
   React.useEffect(() => {
-    fetch('/api/bans')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.bans && data.bans.length > 0) {
-          setBans(data.bans);
-        }
-      })
-      .catch(() => {});
+    fetchBans();
   }, []);
 
   const filteredBans = bans.filter((b) =>
-    b.player.toLowerCase().includes(search.toLowerCase()) ||
-    b.reason.toLowerCase().includes(search.toLowerCase()) ||
-    b.id.toLowerCase().includes(search.toLowerCase()) ||
-    b.steamHex.toLowerCase().includes(search.toLowerCase())
+    (b.player || '').toLowerCase().includes(search.toLowerCase()) ||
+    (b.reason || '').toLowerCase().includes(search.toLowerCase()) ||
+    (b.id || '').toLowerCase().includes(search.toLowerCase()) ||
+    (b.steamHex || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const handleUnban = async (banId, player) => {
@@ -128,7 +73,7 @@ export default function ModerationTab({ onToast }) {
       steamHex: 'steam:1100001' + Math.floor(1000000 + Math.random() * 9000000).toString(16),
       reason: newBanReason,
       admin: 'Maciex (Super Admin)',
-      issuedAt: 'Just now',
+      issuedAt: 'Przed chwilą',
       duration: newBanDuration.toUpperCase(),
       isPermanent: newBanDuration === 'Permanent'
     };
@@ -137,7 +82,7 @@ export default function ModerationTab({ onToast }) {
     setShowNewBanModal(false);
     setNewBanTarget('');
     setNewBanReason('');
-    onToast?.(`Sanction issued: ${newBanTarget}`);
+    onToast?.(`Nałożono sankcję: ${newBanTarget}`);
 
     try {
       await fetch('/api/bans', {
@@ -145,7 +90,51 @@ export default function ModerationTab({ onToast }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBan)
       });
+      fetchBans();
     } catch {}
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      let parsed = JSON.parse(text);
+
+      // Wsparcie dla roznych formatow banlisty (np. { bans: [...] } lub po prostu tablica [...])
+      if (!Array.isArray(parsed) && parsed.bans && Array.isArray(parsed.bans)) {
+        parsed = parsed.bans;
+      }
+
+      if (!Array.isArray(parsed)) {
+        onToast?.(t.moderationTab.importError);
+        return;
+      }
+
+      const res = await fetch('/api/bans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed)
+      });
+
+      const resData = await res.json();
+      if (resData.ok) {
+        onToast?.(`${t.moderationTab.importSuccess}: +${resData.importedCount || parsed.length}`);
+        fetchBans();
+      } else {
+        onToast?.(resData.error || t.moderationTab.importError);
+      }
+    } catch (err) {
+      onToast?.(t.moderationTab.importError);
+    }
   };
 
   return (
@@ -244,6 +233,35 @@ export default function ModerationTab({ onToast }) {
             />
           </div>
 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json,application/json"
+            style={{ display: 'none' }}
+          />
+
+          <button
+            type="button"
+            onClick={fetchBans}
+            disabled={isLoading}
+            className="btn-secondary"
+            style={{ height: '32px', padding: '0 10px', fontSize: '12px' }}
+            title="Odśwież"
+          >
+            <RefreshCw size={13} className={isLoading ? 'anim-spin' : ''} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleImportClick}
+            className="btn-secondary"
+            style={{ height: '32px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}
+          >
+            <Upload size={13} />
+            <span>{t.moderationTab.importBans}</span>
+          </button>
+
           <button
             onClick={() => setShowNewBanModal(true)}
             className="btn-primary"
@@ -278,7 +296,17 @@ export default function ModerationTab({ onToast }) {
               </tr>
             </thead>
             <tbody>
-              {filteredBans.map((ban, idx) => (
+              {filteredBans.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '36px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      <CheckCircle2 size={24} color="var(--status-success)" />
+                      <span style={{ fontSize: '13px' }}>{t.moderationTab.noBansYet}</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredBans.map((ban, idx) => (
                 <tr
                   key={ban.id}
                   className="interactive-row anim-row-stagger"
@@ -346,7 +374,7 @@ export default function ModerationTab({ onToast }) {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

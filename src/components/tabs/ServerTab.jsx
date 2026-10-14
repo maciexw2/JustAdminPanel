@@ -48,7 +48,7 @@ export default function ServerTab({ serverInfo, hardware, onToast }) {
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.serverTab.statFps}</div>
           <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--status-success)', marginTop: '4px' }} className="num-tabular">
-            {serverInfo.fps} FPS <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>· {serverInfo.tickTimeMs}ms</span>
+            {Number(serverInfo.fps || 60).toFixed(1)} FPS <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>· {Number(serverInfo.tickTimeMs || 16.6).toFixed(1)}ms</span>
           </div>
         </div>
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 16px' }}>

@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   ChevronDown,
   Server,
-  ListChecks
+  ListChecks,
+  HeartHandshake
 } from 'lucide-react';
 
 import { useLanguage } from '@/lib/LanguageContext';
@@ -48,7 +49,8 @@ export default function Sidebar({ activeTab, setActiveTab, playerCount = 42, sto
       items: [
         { id: 'checklist', label: t.nav.checklist, icon: ListChecks, badge: 'PROD', badgeVariant: 'warning' },
         { id: 'settings', label: t.nav.settings, icon: Settings },
-        { id: 'admins', label: t.nav.admins, icon: ShieldCheck }
+        { id: 'admins', label: t.nav.admins, icon: ShieldCheck },
+        { id: 'support', label: t.nav.support || 'Support & Credits', icon: HeartHandshake }
       ]
     }
   ];

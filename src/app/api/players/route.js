@@ -20,20 +20,21 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { action, playerId, reason, coords } = body;
+    const { action, playerId, reason, coords, message, seconds } = body;
 
-    if (!action || !playerId) {
+    const globalActions = ['broadcast', 'announcement', 'restart_server', 'clear_cache', 'lockdown'];
+    if (!action || (!playerId && !globalActions.includes(action))) {
       return NextResponse.json({ ok: false, error: 'Brak akcji lub ID gracza' }, { status: 400 });
     }
 
-    const bridgeRes = await sendPlayerAction(action, { playerId, reason, coords });
+    const bridgeRes = await sendPlayerAction(action, { playerId, reason, coords, message, seconds });
 
     return NextResponse.json({
       ok: true,
       action,
-      playerId,
+      playerId: playerId || 'server',
       bridged: bridgeRes.ok,
-      message: `Wykonano ${action} dla gracza #${playerId}`
+      message: `Wykonano ${action} dla ${playerId ? `gracza #${playerId}` : 'serwera'}`
     });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });

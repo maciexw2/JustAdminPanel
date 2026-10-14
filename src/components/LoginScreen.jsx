@@ -113,7 +113,6 @@ export default function LoginScreen({ onLogin }) {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Dynamiczne tło z łagodną poświatą */}
       <div style={{
         position: 'absolute',
         width: '600px',
@@ -222,7 +221,6 @@ export default function LoginScreen({ onLogin }) {
           </div>
         )}
 
-        {/* Automatyczne logowanie Discord */}
         <div className="anim-slide-up delay-2">
           <button
             type="button"

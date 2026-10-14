@@ -19,6 +19,7 @@ export const translations = {
       checklist: 'Checklista Wdrożenia',
       settings: 'Ustawienia',
       admins: 'Administratorzy',
+      support: 'Wsparcie & Credits',
       connectedNode: 'Węzeł FiveM txAdmin',
       activeStatus: 'Aktywny',
       versionTag: 'Wersja v2.4.0'
@@ -80,6 +81,10 @@ export const translations = {
         checklist: {
           title: 'Lista Kontrolna Wdrożenia',
           subtitle: 'Weryfikacja bezpieczeństwa w stylu Vercel przed otwarciem serwera dla graczy.'
+        },
+        support: {
+          title: 'Wsparcie Techniczne & Twórcy',
+          subtitle: 'Oficjalny serwer Discord społeczności, autor projektu oraz repozytorium GitHub.'
         }
       }
     },
@@ -277,7 +282,11 @@ export const translations = {
       days7: '7 Dni',
       days14: '14 Dni',
       warningType: 'Ostrzeżenie (Warn point)',
-      submitSanction: 'Zatwierdź Sankcję'
+      submitSanction: 'Zatwierdź Sankcję',
+      importBans: 'Importuj Bany (JSON)',
+      importSuccess: 'Zaimportowano banów',
+      importError: 'Nieprawidłowy plik JSON lub błąd importu',
+      noBansYet: 'Brak aktywnych banów w systemie'
     },
 
     // Resources Tab
@@ -424,6 +433,7 @@ export const translations = {
       checklist: 'Production Checklist',
       settings: 'Settings',
       admins: 'Admins',
+      support: 'Support & Credits',
       connectedNode: 'FiveM txAdmin Node',
       activeStatus: 'Active',
       versionTag: 'Version v2.4.0'
@@ -485,6 +495,10 @@ export const translations = {
         checklist: {
           title: 'Production Deployment Checklist',
           subtitle: 'Vercel-style security and credentials pre-flight audit before opening to players.'
+        },
+        support: {
+          title: 'Support & Credits',
+          subtitle: 'Official community Discord, project authors, documentation, and GitHub repository.'
         }
       }
     },
@@ -682,7 +696,11 @@ export const translations = {
       days7: '7 Days',
       days14: '14 Days',
       warningType: 'Warning Point (Warn)',
-      submitSanction: 'Apply Sanction'
+      submitSanction: 'Apply Sanction',
+      importBans: 'Import Bans (JSON)',
+      importSuccess: 'Successfully imported bans',
+      importError: 'Invalid JSON file or import failed',
+      noBansYet: 'No active bans registered'
     },
 
     // Resources Tab

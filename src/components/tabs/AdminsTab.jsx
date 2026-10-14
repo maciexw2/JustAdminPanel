@@ -182,7 +182,6 @@ export default function AdminsTab({ onToast }) {
   return (
     <div className="anim-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '0 28px 28px' }}>
       
-      {/* Statystyki personelu */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '14px 16px' }}>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{t.adminsTab.statRegistered}</div>
@@ -213,7 +212,6 @@ export default function AdminsTab({ onToast }) {
         </div>
       </div>
 
-      {/* Pasek narzedzi */}
       <div className="panel-card anim-slide-up delay-2" style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '260px' }}>
           <div style={{ position: 'relative', width: '280px' }}>
@@ -257,7 +255,6 @@ export default function AdminsTab({ onToast }) {
         </button>
       </div>
 
-      {/* Tabela administratorow */}
       <div className="panel-card anim-slide-up delay-3" style={{ overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '12.5px' }}>
           <thead>
@@ -391,7 +388,6 @@ export default function AdminsTab({ onToast }) {
         </table>
       </div>
 
-      {/* Modal dodawania administratora */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div
@@ -578,7 +574,6 @@ export default function AdminsTab({ onToast }) {
         </div>
       )}
 
-      {/* Modal edycji administratora */}
       {showEditModal && selectedAdmin && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div

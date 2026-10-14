@@ -154,11 +154,11 @@ export default function MetricCards({ serverInfo, onOpenResources, onToast }) {
           <span>{t.metrics.sinceBoot} {serverInfo.uptimeStarted}</span>
           <span>·</span>
           <span style={{ color: 'var(--status-success)', fontWeight: 600 }} className="num-tabular">
-            {serverInfo.fps} FPS
+            {Number(serverInfo.fps || 60).toFixed(1)} FPS
           </span>
           <span>•</span>
           <span style={{ color: 'var(--status-success)', fontWeight: 600 }} className="num-tabular">
-            {serverInfo.tickTimeMs}ms
+            {Number(serverInfo.tickTimeMs || 16.6).toFixed(1)}ms
           </span>
         </div>
       </div>

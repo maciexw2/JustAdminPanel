@@ -7,7 +7,6 @@ export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
   const { t } = useLanguage();
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  // wymiary svg
   const width = 800;
   const height = 240;
   const padLeft = 45;
@@ -27,14 +26,12 @@ export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
     { time: 'Now', players: nowCount, isCurrent: true }
   ];
 
-  // oblicz kordynaty
   const points = safeData.map((d, i) => {
     const x = padLeft + (i / Math.max(1, safeData.length - 1)) * chartW;
     const y = padTop + chartH - (d.players / maxPlayers) * chartH;
     return { ...d, x, y };
   });
 
-  // generuj sciezke beziera dla svg
   const generateSmoothPath = (pts) => {
     if (pts.length < 2) return '';
     let path = `M ${pts[0].x} ${pts[0].y}`;
@@ -54,22 +51,26 @@ export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
     return path;
   };
 
-  const linePath = generateSmoothPath(points);
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padTop + chartH} L ${points[0].x} ${padTop + chartH} Z`;
+  const calculatedPeak = Math.max(...safeData.map((d) => d.players || 0), nowCount || 0);
+  const peakItem = safeData.find((d) => d.players === calculatedPeak) || { time: 'Teraz', players: calculatedPeak };
+  const calculatedAvg = safeData.length > 0 ? Math.round(safeData.reduce((acc, curr) => acc + (curr.players || 0), 0) / safeData.length) : nowCount;
 
-  const peakPoint = points.find((p) => p.isPeak) || points[points.length - 3];
+  const linePath = generateSmoothPath(points);
+  const areaPath = points.length > 0
+    ? `${linePath} L ${points[points.length - 1].x} ${padTop + chartH} L ${points[0].x} ${padTop + chartH} Z`
+    : '';
+
+  const peakPoint = points.find((p) => p.players === calculatedPeak && calculatedPeak > 0);
   const nowPoint = points[points.length - 1];
 
   const yTicks = [120, 80, 40, 0];
-  const xLabels = [
-    { label: '00:00', x: points[0]?.x },
-    { label: '04:00', x: points[2]?.x },
-    { label: '08:00', x: points[4]?.x },
-    { label: '12:00', x: points[6]?.x },
-    { label: '16:00', x: points[8]?.x },
-    { label: `21:00 (${t.chart.peak})`, x: peakPoint?.x, isHighlight: true },
-    { label: `${t.chart.liveNow} (${nowCount})`, x: nowPoint?.x, isCurrent: true }
-  ];
+  const xLabels = points.map((p, idx) => {
+    if (idx === 0) return { label: p.time, x: p.x };
+    if (idx === points.length - 1) return { label: `${t.chart.liveNow} (${nowCount})`, x: p.x, isCurrent: true };
+    if (peakPoint && p === peakPoint) return { label: `${p.time} (${t.chart.peak})`, x: p.x, isHighlight: true };
+    if (idx % 2 === 0) return { label: p.time, x: p.x };
+    return null;
+  }).filter(Boolean);
 
   const activePoint = hoveredIndex !== null ? points[hoveredIndex] : null;
 
@@ -109,13 +110,13 @@ export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
           <div>
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{t.chart.peak.toUpperCase()}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#c4b5fd' }} className="num-tabular">
-              118 <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>(21:00)</span>
+              {calculatedPeak} <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>({peakItem.time})</span>
             </div>
           </div>
           <div>
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{t.chart.average.toUpperCase()}</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }} className="num-tabular">
-              54
+              {calculatedAvg}
             </div>
           </div>
         </div>
@@ -206,7 +207,7 @@ export default function PlayerActivityChart({ data = [], nowCount = 0 }) {
                   fontWeight="600"
                   textAnchor="middle"
                 >
-                  118 players
+                  {peakPoint.players} players
                 </text>
               </g>
             </g>

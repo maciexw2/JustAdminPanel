@@ -480,7 +480,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
-        {/* Personalizacja Wyglądu Panelu (Kolory, Motywy) */}
         <div className="panel-card anim-slide-up delay-1" style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <Palette size={16} color="var(--brand-purple)" />
@@ -490,7 +489,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            {/* Wybor koloru akcentu */}
             <div>
               <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
                 {t.brandColorLabel}
@@ -543,7 +541,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
               </div>
             </div>
 
-            {/* Wybor stylu ciemnego tla */}
             <div>
               <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
                 {t.bgThemeLabel}
@@ -580,7 +577,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
         </div>
 
-        {/* Most FiveM */}
         <div className="panel-card anim-slide-up delay-2" style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -723,7 +719,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
         </div>
 
-        {/* Tożsamość serwera */}
         <div className="panel-card anim-slide-up delay-3" style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <Server size={16} color="var(--brand-purple)" />
@@ -874,7 +869,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
         </div>
 
-        {/* Bezpieczeństwo i RCON */}
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <Lock size={16} color="#fbbf24" />
@@ -968,7 +962,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
         </div>
 
-        {/* Webhooks Discord */}
         <div className="panel-card anim-slide-up delay-4" style={{ padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <Bell size={16} color="#60a5fa" />
@@ -1086,7 +1079,6 @@ export default function SettingsTab({ serverInfo, onToast, onNavigateTab }) {
           </div>
         </div>
 
-        {/* Pasek akcji */}
         <div className="anim-slide-up delay-5" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button
             type="button"

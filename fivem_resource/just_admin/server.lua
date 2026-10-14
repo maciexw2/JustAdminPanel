@@ -147,22 +147,68 @@ SetHttpHandler(function(req, res)
             local reason = data.reason or 'Decyzja administratora'
 
             if action == 'kick' then
-                DropPlayer(targetId, 'Just AdminPanel: ' .. reason)
+                if CustomBridge and CustomBridge.OnKick then
+                    CustomBridge.OnKick(targetId, reason, data.admin, data)
+                else
+                    DropPlayer(targetId, 'Just AdminPanel: ' .. reason)
+                end
                 return sendJson(res, 200, { ok = true, message = 'Wyrzucono gracza' })
             elseif action == 'ban' then
-                DropPlayer(targetId, 'Just AdminPanel [BAN]: ' .. reason)
+                if CustomBridge and CustomBridge.OnBan then
+                    CustomBridge.OnBan(targetId, reason, data.duration, data.admin, data)
+                else
+                    DropPlayer(targetId, 'Just AdminPanel [BAN]: ' .. reason)
+                end
                 return sendJson(res, 200, { ok = true, message = 'Zbanowano gracza' })
             elseif action == 'revive' or action == 'heal' then
-                local ped = GetPlayerPed(targetId)
-                SetEntityHealth(ped, 200)
-                SetPedArmour(ped, 100)
-                TriggerClientEvent('esx_ambulancejob:revive', targetId)
-                TriggerClientEvent('hospital:client:Revive', targetId)
+                if CustomBridge and CustomBridge.OnRevive then
+                    CustomBridge.OnRevive(targetId, data)
+                else
+                    local ped = GetPlayerPed(targetId)
+                    SetEntityHealth(ped, 200)
+                    SetPedArmour(ped, 100)
+                    TriggerClientEvent('esx_ambulancejob:revive', targetId)
+                    TriggerClientEvent('hospital:client:Revive', targetId)
+                end
                 return sendJson(res, 200, { ok = true, message = 'Uleczono gracza' })
             elseif action == 'teleport' and data.coords then
-                local ped = GetPlayerPed(targetId)
-                SetEntityCoords(ped, data.coords.x, data.coords.y, data.coords.z, false, false, false, false)
+                if CustomBridge and CustomBridge.OnTeleport then
+                    CustomBridge.OnTeleport(targetId, data.coords, data)
+                else
+                    local ped = GetPlayerPed(targetId)
+                    SetEntityCoords(ped, data.coords.x, data.coords.y, data.coords.z, false, false, false, false)
+                end
                 return sendJson(res, 200, { ok = true, message = 'Przeniesiono gracza' })
+            elseif action == 'broadcast' or action == 'announcement' then
+                local msg = data.message or 'Ogłoszenie administracji'
+                if CustomBridge and CustomBridge.OnAnnouncement then
+                    CustomBridge.OnAnnouncement(msg, data)
+                else
+                    TriggerClientEvent('chat:addMessage', -1, {
+                        color = { 255, 90, 31 },
+                        multiline = true,
+                        args = { 'OGŁOSZENIE / BROADCAST', msg }
+                    })
+                end
+                return sendJson(res, 200, { ok = true, message = 'Wysłano ogłoszenie na serwer' })
+            elseif action == 'restart_server' then
+                local delay = tonumber(data.seconds) or 60
+                TriggerClientEvent('chat:addMessage', -1, {
+                    color = { 239, 68, 68 },
+                    multiline = true,
+                    args = { 'SERWER', ('Restart serwera za %d sekund! Zapisz stan postaci.'):format(delay) }
+                })
+                SetTimeout(delay * 1000, function()
+                    ExecuteCommand('quit "Zaplanowany restart serwera przez panel JustAdmin"')
+                end)
+                return sendJson(res, 200, { ok = true, message = ('Zaplanowano restart za %ds'):format(delay) })
+            elseif action == 'clear_cache' then
+                -- Bezpieczne wymuszenie czyszczenia zasobów i garbage collectora Lua
+                collectgarbage('collect')
+                return sendJson(res, 200, { ok = true, message = 'Wyczyszczono pamięć podręczną Lua i zasobów' })
+            elseif action == 'lockdown' then
+                ExecuteCommand('sv_maxclients 0')
+                return sendJson(res, 200, { ok = true, message = 'Włączono tryb lockdown (sv_maxclients 0)' })
             end
 
             return sendJson(res, 400, { ok = false, error = 'Nieznana akcja' })

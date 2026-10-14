@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/LanguageContext';
 
-export default function PlayerInspectModal({ player, isOpen, onClose, onKick, onBan, onToast }) {
+export default function PlayerInspectModal({ player, isOpen, onClose, onKick, onBan, onRevive, onTeleport, onToast }) {
   const { t } = useLanguage();
   const [banReason, setBanReason] = useState('Cheating / Suspicious lua executor injection');
   const [showBanConfirm, setShowBanConfirm] = useState(false);
@@ -27,11 +27,19 @@ export default function PlayerInspectModal({ player, isOpen, onClose, onKick, on
   if (!isOpen || !player) return null;
 
   const handleRevive = () => {
-    onToast?.(`Player #${player.id} (${player.name}) has been revived and healed to 100%`);
+    if (onRevive) {
+      onRevive(player.id);
+    } else {
+      onToast?.(`Player #${player.id} (${player.name}) has been revived and healed to 100%`);
+    }
   };
 
   const handleTeleport = () => {
-    onToast?.(`Teleported admin to ${player.name} (${player.coords})`);
+    if (onTeleport) {
+      onTeleport(player.id, player.coords);
+    } else {
+      onToast?.(`Teleported admin to ${player.name} (${player.coords})`);
+    }
   };
 
   const handleKickSubmit = () => {

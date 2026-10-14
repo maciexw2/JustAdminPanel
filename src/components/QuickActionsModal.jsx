@@ -21,29 +21,66 @@ export default function QuickActionsModal({ isOpen, onClose, onToast, onOpenCons
 
   if (!isOpen) return null;
 
-  const handleSendAnnouncement = (e) => {
+  const handleSendAnnouncement = async (e) => {
     e.preventDefault();
     if (!announcement.trim()) return;
-    onToast?.(`Broadcast sent to all 42 players: "${announcement}"`);
+    const msg = announcement.trim();
     setAnnouncement('');
+    onToast?.(`Broadcast sent: "${msg}"`);
+
+    try {
+      await fetch('/api/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: `say ^3[OGŁOSZENIE]^7 ${msg}` })
+      });
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'broadcast', playerId: 'all', message: msg })
+      });
+    } catch {}
   };
 
-  const handleRestart = (seconds) => {
+  const handleRestart = async (seconds) => {
     setIsRestarting(true);
     onToast?.(`Scheduled server restart scheduled in ${seconds}s with global broadcast`);
+
+    try {
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restart_server', playerId: 'server', seconds })
+      });
+    } catch {}
+
     setTimeout(() => {
       setIsRestarting(false);
       onClose();
     }, 1500);
   };
 
-  const handleClearCache = () => {
-    onToast?.(`FXServer cache cleared successfully (184 MB freed)`);
+  const handleClearCache = async () => {
+    onToast?.(`FXServer cache cleared successfully (Lua GC collected)`);
+    try {
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'clear_cache', playerId: 'server' })
+      });
+    } catch {}
     onClose();
   };
 
-  const handleLockdown = () => {
+  const handleLockdown = async () => {
     onToast?.(`Server lockdown active. Non-whitelisted connections rejected.`);
+    try {
+      await fetch('/api/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'lockdown', playerId: 'server' })
+      });
+    } catch {}
     onClose();
   };
 

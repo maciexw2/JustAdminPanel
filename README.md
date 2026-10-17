@@ -1,6 +1,6 @@
 <div align="center">
 
-[🇬🇧 English](README.md) • [🇵🇱 Polski](README_PL.md)
+[🇬🇧 English](README.md) • [🇵🇱 Polski](README_PL.md) • [DISCORD](https://discord.gg/b8PfHMmfK8)
 
 </div>
 
